@@ -11,19 +11,46 @@
   </div>
 
   <div class="result-card">
-    <div class="result-header">Model Loss</div>
+    <div class="result-header">
+      <span>Model Loss</span>
+      <button id="downloadChartBtn" class="icon-button" title="Download chart">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
     <div class="result-content">
       <div class="training-result">
         <div class="training-subtitle">Epoch <span id="trainingTitleEpoch">0</span></div>
         <div class="chart-container">
-          <svg id="lossSvg" viewBox="0 0 200 80" preserveAspectRatio="none">
-            <polyline id="lossLine" fill="none" stroke="#38bdf8" stroke-width="2" points="" />
-            <polyline id="valLine" fill="none" stroke="#f59e0b" stroke-width="2" points="" />
+          <svg id="lossSvg" viewBox="0 0 240 140" preserveAspectRatio="none">
+            <!-- Background grid -->
+            <g class="grid-lines" stroke="rgba(255,255,255,0.1)" stroke-width="1">
+              <!-- Will be filled by JS -->
+            </g>
+            <!-- Axis arrows -->
+            <defs>
+              <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                <path d="M 0 0 L 6 3 L 0 6 z" fill="rgba(255,255,255,0.5)"/>
+              </marker>
+            </defs>
+            <!-- Axes with arrows -->
+            <line class="axis" x1="40" y1="110" x2="220" y2="110" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+            <line class="axis" x1="40" y1="110" x2="40" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+            <!-- Origin point -->
+            <circle cx="40" cy="110" r="2" fill="rgba(255,255,255,0.4)"/>
+            <!-- Chart area -->
+            <g transform="translate(40,0)">
+              <polyline id="lossLine" fill="none" stroke="#38bdf8" stroke-width="2" points="" />
+              <polyline id="valLine" fill="none" stroke="#f59e0b" stroke-width="2" points="" />
+            </g>
           </svg>
         </div>
         <div class="loss-legend">
-          <span class="legend"><span class="dot loss-dot"></span> Loss</span>
-          <span class="legend"><span class="dot val-dot"></span> Val Loss</span>
+          <div class="loss-info">
+            <span class="legend"><span class="dot loss-dot"></span> Loss</span>
+            <span class="legend"><span class="dot val-dot"></span> Val Loss</span>
+          </div>
         </div>
       </div>
     </div>
