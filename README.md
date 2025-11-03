@@ -95,29 +95,4 @@ Security note: This project is purely a client-side demo. If you expose model do
 - To add a new UI component: create `components/your_component.html`, add a placeholder div to `index.html`, and update `js/components.js` to load it.
 - To add new JS functionality: add a module under `js/modules/` and import it from `js/app.js` (remember to keep `app.js` a module via `<script type="module">`).
 
----
 
-Xin chào — nếu bạn muốn mình viết ghi chú/phiên bản README bằng tiếng Việt đầy đủ hơn, mình sẽ bổ sung phiên bản tiếng Việt.
-
-License: MIT (you can change as needed)
-Training Dashboard - Static Demo
-
-This is a small static demo that reproduces the three-column training dashboard from the screenshot.
-
-Files:
-- index.html — main page
-- css/styles.css — styles
-- js/app.js — small demo logic to simulate training
-
-How to run:
-1. Open `index.html` in your browser (double-click or `xdg-open index.html`).
-2. Click "Start Training" to simulate training logs and watch the progress.
-
-Next steps / options:
-- Convert to a React app (Vite) if you want componentized code and state management.
-- Hook the UI to a backend that streams real training metrics (WebSocket or SSE).
-- Add charts (Chart.js or D3) to replace the small inline SVG.
-
-If you want, I can:
-- Convert this into a React + Vite + Tailwind project with source build scripts.
-- Add downloadable assets and a real chart library.
