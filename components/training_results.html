@@ -1,0 +1,49 @@
+<aside class="rightpanel results-panel">
+  <div class="result-main-tag">Training Results</div>
+  <div class="result-card">
+    <div class="result-header">Inference Result</div>
+    <div class="result-content">
+      <div class="inference-result">
+        <div class="inference-box">Input Image</div>
+        <div class="inference-box">Prediction</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-card">
+    <div class="result-header">Model Loss</div>
+    <div class="result-content">
+      <div class="training-result">
+        <div class="training-subtitle">Epoch <span id="trainingTitleEpoch">0</span></div>
+        <div class="chart-container">
+          <svg id="lossSvg" viewBox="0 0 200 80" preserveAspectRatio="none">
+            <polyline id="lossLine" fill="none" stroke="#38bdf8" stroke-width="2" points="" />
+            <polyline id="valLine" fill="none" stroke="#f59e0b" stroke-width="2" points="" />
+          </svg>
+        </div>
+        <div class="loss-legend">
+          <span class="legend"><span class="dot loss-dot"></span> Loss</span>
+          <span class="legend"><span class="dot val-dot"></span> Val Loss</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-card">
+    <div class="result-header">Model Info</div>
+    <div class="result-content">
+      <div class="model-info-grid">
+        <div class="info-label">Model Type</div>
+        <div class="info-value" id="tagModel">Neural Network</div>
+        <div class="info-label">Task</div>
+        <div class="info-value" id="tagTask">Classification</div>
+        <div class="info-label">Parameters</div>
+        <div class="info-value" id="tagParams">2.4M</div>
+        <div class="info-label">Training Time</div>
+        <div class="info-value" id="tagTime">~100s</div>
+      </div>
+    </div>
+  </div>
+  
+  <button id="downloadBtn" class="secondary">Download Model</button>
+</aside>

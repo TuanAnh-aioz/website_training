@@ -1,0 +1,79 @@
+<aside class="sidebar">
+  <h2>Training Options</h2>
+  <div class="form-group">
+    <label for="taskType">Task Type</label>
+    <select id="taskType">
+      <option value="classification">Classification</option>
+      <option value="detection">Detection</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="datasetSelect">Dataset</label>
+    <select id="datasetSelect">
+      <option value="cat_dog">Cat &amp; Dog</option>
+      <option value="traffic_light">Traffic Light</option>
+      <option value="coco">COCO</option>
+      <option value="custom">Custom</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="modelSelect">Model</label>
+    <select id="modelSelect"></select>
+  </div>
+
+  <div class="form-group">
+    <label for="optimizerSelect">Optimizer</label>
+    <select id="optimizerSelect">
+      <option>SGD</option>
+      <option selected>Adam</option>
+      <option>AdamW</option>
+      <option>RMSprop</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="schedulerSelect">Scheduler</label>
+    <select id="schedulerSelect">
+      <option>StepLR</option>
+      <option selected>CosineAnnealingLR</option>
+      <option>ReduceLROnPlateau</option>
+      <option>ExponentialLR</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="lossSelect">Loss Function</label>
+    <select id="lossSelect">
+      <option selected>CrossEntropyLoss</option>
+      <option>FocalLoss (custom)</option>
+      <option>BCELoss</option>
+      <option>MSELoss</option>
+    </select>
+  </div>
+
+  <div class="form-group two-col">
+    <div>
+      <label for="learningRate">Learning Rate</label>
+      <input id="learningRate" type="text" value="0.001">
+    </div>
+    <div>
+      <label for="batchSize">Batch Size</label>
+      <input id="batchSize" type="text" value="32">
+    </div>
+  </div>
+
+  <div class="form-group two-col">
+    <div>
+      <label for="epochs">Epochs</label>
+      <input id="epochs" type="text" value="50">
+    </div>
+    <div class="checkbox-row">
+      <input id="pretrained" type="checkbox" checked>
+      <label for="pretrained">Use Pretrained Weights</label>
+    </div>
+  </div>
+
+  <button id="startBtn" class="primary">Start Training</button>
+</aside>

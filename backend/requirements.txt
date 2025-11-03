@@ -1,8 +1,0 @@
-fastapi
-uvicorn
-python-multipart
-aiofiles
-torch
-torchvision
-numpy
-sse-starlette
