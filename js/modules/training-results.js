@@ -168,10 +168,11 @@ export class TrainingResults {
     }
 
     downloadModel() {
+        const epochInput = document.getElementById('epochs');
         const model = {
             name: 'vgg16-demo',
             task: 'classification',
-            epochs: 50,
+            epochs: epochInput ? (isNaN(parseInt(epochInput.value,10)) ? 50 : parseInt(epochInput.value,10)) : 50,
             accuracy: document.getElementById('acc').textContent,
             params: '2.4M'
         };

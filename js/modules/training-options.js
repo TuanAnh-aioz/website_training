@@ -21,6 +21,10 @@ export class TrainingOptions {
             this.schedulerSelect = document.getElementById('schedulerSelect');
             this.lossSelect = document.getElementById('lossSelect');
             this.datasetSelect = document.getElementById('datasetSelect');
+            this.learningRate = document.getElementById('learningRate');
+            this.batchSize = document.getElementById('batchSize');
+            this.epochs = document.getElementById('epochs');
+            this.pretrained = document.getElementById('pretrained');
             
             if (this.taskType && this.modelSelect) {
                 clearInterval(initInterval);
@@ -48,6 +52,10 @@ export class TrainingOptions {
             optimizer: this.optimizerSelect.value,
             scheduler: this.schedulerSelect.value,
             loss: this.lossSelect.value,
+            epochs: this.epochs ? (isNaN(parseInt(this.epochs.value,10)) ? 50 : parseInt(this.epochs.value,10)) : 50,
+            learningRate: this.learningRate ? this.learningRate.value : null,
+            batchSize: this.batchSize ? this.batchSize.value : null,
+            pretrained: this.pretrained ? this.pretrained.checked : false,
             dataset: this.datasetSelect ? this.datasetSelect.options[this.datasetSelect.selectedIndex].text : 'N/A'
         };
     }

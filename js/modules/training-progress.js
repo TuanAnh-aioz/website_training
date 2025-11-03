@@ -15,17 +15,30 @@ export class TrainingProgress {
     updateProgress(epoch, loss, acc, valLoss) {
         this.epochEl.textContent = `${epoch}/${this.totalEpochs}`;
         this.lossEl.textContent = loss;
-        this.accEl.textContent = acc + '%';
+        // Normalize accuracy: strip any '%' characters and whitespace, then append one '%'
+        try {
+            let accStr = (acc === null || acc === undefined) ? '' : String(acc);
+            accStr = accStr.replace(/%/g, '').trim();
+            if (accStr === '') {
+                this.accEl.textContent = '-';
+            } else {
+                this.accEl.textContent = accStr + '%';
+            }
+        } catch (e) {
+            // fallback
+            this.accEl.textContent = String(acc);
+        }
         this.valLossEl.textContent = valLoss;
         
         const pct = Math.round((epoch/this.totalEpochs)*100);
         this.progressBar.style.width = pct + '%';
     }
 
-    reset() {
+    // Reset progress state. If updateUI is true (default) update the displayed metrics.
+    reset(updateUI = true) {
         this.epoch = 0;
         this.running = false;
-        this.updateProgress(0, '-', '-', '-');
+        if (updateUI) this.updateProgress(0, '-', '-', '-');
     }
 
     format(n, digits=3) {

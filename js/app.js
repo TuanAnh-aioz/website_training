@@ -39,6 +39,27 @@ class App {
                 }, 0);
             });
         }
+
+        // Live-sync epochs input so the progress display shows the configured total immediately
+        const epochsInput = document.getElementById('epochs');
+        if (epochsInput) {
+            const syncEpochs = () => {
+                const v = parseInt(epochsInput.value, 10);
+                if (!Number.isNaN(v) && v > 0) {
+                    this.progress.totalEpochs = v;
+                    // read current displayed metrics
+                    const loss = this.progress.lossEl ? this.progress.lossEl.textContent : '-';
+                    let acc = this.progress.accEl ? this.progress.accEl.textContent : '-';
+                    if (typeof acc === 'string' && acc.endsWith('%')) acc = acc.slice(0, -1);
+                    const valLoss = this.progress.valLossEl ? this.progress.valLossEl.textContent : '-';
+                    // update UI to show current epoch/totalEpochs
+                    this.progress.updateProgress(this.progress.epoch, loss, acc, valLoss);
+                }
+            };
+            epochsInput.addEventListener('input', syncEpochs);
+            // also run once to sync initial value
+            setTimeout(syncEpochs, 0);
+        }
     }
 
     toggleTraining() {
@@ -52,16 +73,23 @@ class App {
     startTraining() {
         // Reset everything
         this.logs.clearLogs();
-        this.progress.reset();
+        // Read options and apply configured epochs
+        const options = this.options.getCurrentOptions();
+        if (options && options.epochs) {
+            const e = Number(options.epochs);
+            if (!Number.isNaN(e) && e > 0) this.progress.totalEpochs = e;
+        }
+
+    // reset internal state but avoid briefly showing 0/<epochs> in the UI
+    this.progress.reset(false);
         this.results.reset();
         
         this.progress.running = true;
         this.startBtn.textContent = 'Stop Training';
         this.logs.log('Training started');
 
-        // Log initial configuration
-        const options = this.options.getCurrentOptions();
-        this.logs.log(`Dataset=${options.dataset} Model=${options.model} Optimizer=${options.optimizer} Scheduler=${options.scheduler} Loss=${options.loss}`);
+    // Log initial configuration
+    this.logs.log(`Dataset=${options.dataset} Model=${options.model} Optimizer=${options.optimizer} Scheduler=${options.scheduler} Loss=${options.loss} Epochs=${this.progress.totalEpochs}`);
         
         this.step();
     }
