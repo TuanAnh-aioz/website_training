@@ -25,20 +25,20 @@ class App {
         }
 
         // Link model selection to tags update
-        const modelSelect = document.getElementById('modelSelect');
-        const taskType = document.getElementById('taskType');
-        if(modelSelect) {
-            modelSelect.addEventListener('change', () => {
-                this.results.updateModelTags(taskType.value, modelSelect.value);
-            });
-        }
-        if(taskType) {
-            taskType.addEventListener('change', () => {
-                setTimeout(() => {
-                    this.results.updateModelTags(taskType.value, modelSelect.value);
-                }, 0);
-            });
-        }
+        // const modelSelect = document.getElementById('modelSelect');
+        // const taskType = document.getElementById('taskType');
+        // if(modelSelect) {
+        //     modelSelect.addEventListener('change', () => {
+        //         this.results.updateModelTags(taskType.value, modelSelect.value);
+        //     });
+        // }
+        // if(taskType) {
+        //     taskType.addEventListener('change', () => {
+        //         setTimeout(() => {
+        //             this.results.updateModelTags(taskType.value, modelSelect.value);
+        //         }, 0);
+        //     });
+        // }
 
         // Live-sync epochs input so the progress display shows the configured total immediately
         const epochsInput = document.getElementById('epochs');
@@ -122,6 +122,15 @@ class App {
             this.progress.running = false;
             this.startBtn.textContent = 'Start Training';
             this.logs.log('Training completed.');
+
+            // Lấy config từ TrainingOptions
+            const options = this.options.getCurrentOptions();
+            
+            // Cập nhật model info
+            this.results.tagModel.textContent = options.model
+            this.results.tagParams.textContent = options.params || '2.4M'
+            this.results.tagTime.textContent = `~${this.progress.totalEpochs * 2}s`
+            this.results.tagTask.textContent = options.task
         }
     }
 }

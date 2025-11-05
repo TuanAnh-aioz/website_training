@@ -47,16 +47,17 @@ export class TrainingOptions {
 
     getCurrentOptions() {
         return {
-            task: this.taskType.value,
-            model: this.modelSelect.value,
-            optimizer: this.optimizerSelect.value,
-            scheduler: this.schedulerSelect.value,
-            loss: this.lossSelect.value,
-            epochs: this.epochs ? (isNaN(parseInt(this.epochs.value,10)) ? 50 : parseInt(this.epochs.value,10)) : 50,
-            learningRate: this.learningRate ? this.learningRate.value : null,
-            batchSize: this.batchSize ? this.batchSize.value : null,
-            pretrained: this.pretrained ? this.pretrained.checked : false,
-            dataset: this.datasetSelect ? this.datasetSelect.options[this.datasetSelect.selectedIndex].text : 'N/A'
+            model: document.getElementById('modelSelect')?.value || 'Unknown',
+            task: document.getElementById('taskType')?.value || 'Classification',
+            dataset: document.getElementById('datasetSelect')?.value || '',
+            optimizer: document.getElementById('optimizerSelect')?.value || '',
+            scheduler: document.getElementById('schedulerSelect')?.value || '',
+            loss: document.getElementById('lossSelect')?.value || '',
+            epochs: Number(document.getElementById('epochs')?.value) || 5,
+            batchSize: Number(document.getElementById('batchSize')?.value) || 32,
+            learningRate: Number(document.getElementById('learningRate')?.value) || 0.001,
+            pretrained: document.getElementById('pretrained')?.checked || false,
+            params: '21.1M', // ví dụ cho model VGG16
         };
     }
 }

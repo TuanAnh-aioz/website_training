@@ -23,12 +23,6 @@ export class TrainingResults {
         }
     }
 
-    updateModelTags(taskType, modelName) {
-        if(this.tagTask) this.tagTask.textContent = `Task: ${taskType.charAt(0).toUpperCase() + taskType.slice(1)}`;
-        if(this.tagModel) this.tagModel.textContent = `Model: ${modelName}`;
-        if(this.tagParams) this.tagParams.textContent = `Parameters: 2.4M`;
-        if(this.tagTime) this.tagTime.textContent = `Training Time: ~100s`;
-    }
 
     updateEpoch(epoch) {
         const el = document.getElementById('trainingTitleEpoch');
@@ -172,7 +166,7 @@ export class TrainingResults {
         const model = {
             name: 'vgg16-demo',
             task: 'classification',
-            epochs: epochInput ? (isNaN(parseInt(epochInput.value,10)) ? 50 : parseInt(epochInput.value,10)) : 50,
+            epochs: epochInput ? (isNaN(parseInt(epochInput.value,10)) ? 5 : parseInt(epochInput.value,10)) : 5,
             accuracy: document.getElementById('acc').textContent,
             params: '2.4M'
         };
@@ -196,5 +190,12 @@ export class TrainingResults {
         this.lossHistory = [];
         this.valLossHistory = [];
         this.updateLossChart();
+
+        if(this.tagModel) this.tagModel.textContent = '-';
+        if(this.tagParams) this.tagParams.textContent = '-';
+        if(this.tagTime) this.tagTime.textContent = '-';
+        if(this.tagTask) this.tagTask.textContent = '-';
+    
     }
+
 }

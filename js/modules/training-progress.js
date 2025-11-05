@@ -8,7 +8,7 @@ export class TrainingProgress {
         this.progressBar = document.querySelector('#globalProgress > div');
         
         this.epoch = 0;
-        this.totalEpochs = 50;
+        this.totalEpochs = 5;
         this.running = false;
     }
 
