@@ -49,6 +49,7 @@ const AVAILABLE_TRANSFORMS = {
 export class TrainingOptions {
     constructor() {
         this.transforms = [];
+        this.expandedId = null;
         this.initializeElements();
     }
 
@@ -64,7 +65,6 @@ export class TrainingOptions {
             this.batchSize = document.getElementById('batchSize');
             this.epochs = document.getElementById('epochs');
             this.pretrained = document.getElementById('pretrained');
-            // this.transformSelect = document.getElementById('transformSelect');
             
             this.transformSelect = document.getElementById("transformSelect");
             this.transformContainer = document.getElementById("transformContainer");
@@ -78,14 +78,6 @@ export class TrainingOptions {
                 });
                 this.populateModels();
             }
-
-            // if (this.transformSelect) {
-            //     clearInterval(initInterval);
-            //     this.taskType.addEventListener('change', () => {
-            //         this.populateTransforms();
-            //     });
-            //     this.populateTransforms();
-            // }
 
             if (this.transformSelect && this.addTransformBtn) {
                 clearInterval(initInterval);
@@ -116,113 +108,109 @@ export class TrainingOptions {
 
         const cfg = AVAILABLE_TRANSFORMS[value];
         const params = {};
-        cfg.params.forEach((p) => (params[p.name] = p.default));
+        cfg.params.forEach(p => (params[p.name] = p.default));
 
         this.transforms.push({
         id: Date.now(),
         name: value,
         enabled: true,
-        params,
+        params
         });
 
         this.transformSelect.value = "";
         this.renderTransforms();
     }
 
+
     removeTransform(id) {
         this.transforms = this.transforms.filter(t => t.id !== id);
+        if (this.expandedId === id) this.expandedId = null;
         this.renderTransforms();
     }
 
     toggleTransform(id) {
         const t = this.transforms.find(t => t.id === id);
         if (t) t.enabled = !t.enabled;
-        this.renderTransforms();
+        this.renderTransforms(false);
     }
-    
+
+    toggleParamPanel(id) {
+        this.expandedId = this.expandedId === id ? null : id;
+        this.renderTransforms(false);
+    }
+
     updateParam(id, paramName, value) {
-        const t = this.transforms.find((t) => t.id === id);
+        const t = this.transforms.find(t => t.id === id);
         if (t) {
         t.params[paramName] = value;
-        this.renderTransforms(false); // không reset UI hoàn toàn
+        this.renderTransforms(false);
         }
     }
 
-    renderTransforms(refresh = true) {
-        if (refresh) this.transformContainer.innerHTML = "";
+    renderTransforms() {
+        this.transformContainer.innerHTML = "";
 
         if (this.transforms.length === 0) {
-        this.transformContainer.innerHTML =
-            '<p style="color:#9ca3af;font-size:12px;text-align:center;">No transforms added.</p>';
-        this.preview.textContent = "";
-        return;
+            this.transformContainer.innerHTML = '<p style="color:#9ca3af;font-size:12px;text-align:center;">No transforms added.</p>';
+            this.preview.textContent = '';
+            return;
         }
 
-        this.transforms.forEach((t) => {
-        const cfg = AVAILABLE_TRANSFORMS[t.name];
-        const div = document.createElement("div");
-        div.className = "transform-item";
+        this.transforms.forEach(t => {
+            const cfg = AVAILABLE_TRANSFORMS[t.name];
+            const div = document.createElement("div");
+            div.className = "transform-item";
 
-        div.innerHTML = `
-            <div class="transform-header">
-            <input type="checkbox" ${t.enabled ? "checked" : ""}>
-            <span>${cfg.label}</span>
-            <button>&times;</button>
-            </div>
-        `;
+            // Header chỉ hiển thị tên + Settings + Delete
+            const header = document.createElement("div");
+            header.className = "transform-header";
+            header.innerHTML = `
+                <span>${cfg.label}</span>
+                <button class="btn-settings">⚙</button>
+                <button class="btn-delete">&times;</button>
+            `;
+            header.querySelector(".btn-delete").addEventListener("click", () => this.removeTransform(t.id));
+            header.querySelector(".btn-settings").addEventListener("click", () => this.toggleParamPanel(t.id));
+            div.appendChild(header);
 
-        // Param inputs
-        cfg.params.forEach((p) => {
-            const g = document.createElement("div");
-            g.className = "param-group";
+            if (this.expandedId === t.id) {
+                cfg.params.forEach(p => {
+                    const g = document.createElement("div");
+                    g.className = "param-group";
+                    g.innerHTML = `<label>${p.name}</label>`;
 
-            g.innerHTML = `<label>${p.name}</label>`;
-
-            if (p.type === "select") {
-            const s = document.createElement("select");
-            p.options.forEach((opt) => {
-                const o = document.createElement("option");
-                o.value = opt;
-                o.textContent = opt;
-                if (t.params[p.name] === opt) o.selected = true;
-                s.appendChild(o);
-            });
-            s.addEventListener("change", (e) =>
-                this.updateParam(t.id, p.name, e.target.value)
-            );
-            g.appendChild(s);
-            } else {
-            const i = document.createElement("input");
-            i.type = p.type === "number" ? "number" : "text";
-            i.value = t.params[p.name];
-            i.addEventListener("input", (e) =>
-                this.updateParam(
-                t.id,
-                p.name,
-                p.type === "number" ? parseFloat(e.target.value) : e.target.value
-                )
-            );
-            g.appendChild(i);
+                    if (p.type === "select") {
+                        const s = document.createElement("select");
+                        p.options.forEach(opt => {
+                            const o = document.createElement("option");
+                            o.value = opt;
+                            o.textContent = opt;
+                            if (t.params[p.name] === opt) o.selected = true;
+                            s.appendChild(o);
+                        });
+                        s.addEventListener("change", e => this.updateParam(t.id, p.name, e.target.value));
+                        g.appendChild(s);
+                    } else {
+                        const i = document.createElement("input");
+                        i.type = p.type === "number" ? "number" : "text";
+                        i.value = t.params[p.name];
+                        i.addEventListener("input", e =>
+                            this.updateParam(t.id, p.name, p.type === "number" ? parseFloat(e.target.value) : e.target.value)
+                        );
+                        g.appendChild(i);
+                    }
+                    div.appendChild(g);
+                });
             }
-            div.appendChild(g);
-        });
 
-        div.querySelector("input[type=checkbox]").addEventListener("change", () =>
-            this.toggleTransform(t.id)
-        );
-        div.querySelector("button").addEventListener("click", () =>
-            this.removeTransform(t.id)
-        );
-
-        this.transformContainer.appendChild(div);
+            this.transformContainer.appendChild(div);
         });
 
         this.preview.textContent = JSON.stringify(this.transforms, null, 2);
-    }
+        }
 
     populateTransforms() {
-        this.transformSelect.innerHTML =
-        '<option value="">Select a transform...</option>';
+        this.transformSelect.innerHTML = '<option value="">Select a transform...</option>';
         Object.entries(AVAILABLE_TRANSFORMS).forEach(([key, cfg]) => {
         const opt = document.createElement("option");
         opt.value = key;
