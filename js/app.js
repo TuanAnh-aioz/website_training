@@ -24,22 +24,6 @@ class App {
             this.startBtn.addEventListener('click', () => this.toggleTraining());
         }
 
-        // Link model selection to tags update
-        // const modelSelect = document.getElementById('modelSelect');
-        // const taskType = document.getElementById('taskType');
-        // if(modelSelect) {
-        //     modelSelect.addEventListener('change', () => {
-        //         this.results.updateModelTags(taskType.value, modelSelect.value);
-        //     });
-        // }
-        // if(taskType) {
-        //     taskType.addEventListener('change', () => {
-        //         setTimeout(() => {
-        //             this.results.updateModelTags(taskType.value, modelSelect.value);
-        //         }, 0);
-        //     });
-        // }
-
         // Live-sync epochs input so the progress display shows the configured total immediately
         const epochsInput = document.getElementById('epochs');
         if (epochsInput) {
@@ -63,6 +47,7 @@ class App {
     }
 
     toggleTraining() {
+        this.clearModelInfo();
         if(this.progress.running) {
             this.stopTraining();
         } else {
@@ -80,17 +65,16 @@ class App {
             if (!Number.isNaN(e) && e > 0) this.progress.totalEpochs = e;
         }
 
-    // reset internal state but avoid briefly showing 0/<epochs> in the UI
-    this.progress.reset(false);
+        // reset internal state but avoid briefly showing 0/<epochs> in the UI
+        this.progress.reset(false);
         this.results.reset();
         
         this.progress.running = true;
         this.startBtn.textContent = 'Stop Training';
         this.logs.log('Training started');
 
-    // Log initial configuration
-    this.logs.log(`Dataset=${options.dataset} Model=${options.model} Optimizer=${options.optimizer} Scheduler=${options.scheduler} Loss=${options.loss} Epochs=${this.progress.totalEpochs}`);
-        
+        // Log initial configuration
+        this.logs.log(`Dataset=${options.dataset} Model=${options.model} Optimizer=${options.optimizer} Scheduler=${options.scheduler} Loss=${options.loss} Epochs=${this.progress.totalEpochs}`);
         this.step();
     }
 
@@ -98,6 +82,10 @@ class App {
         this.progress.running = false;
         this.startBtn.textContent = 'Start Training';
         this.logs.log('Training stopped by user');
+    }
+
+    clearModelInfo() {
+        this.results.reset()
     }
 
     step() {
@@ -123,14 +111,12 @@ class App {
             this.startBtn.textContent = 'Start Training';
             this.logs.log('Training completed.');
 
-            // Lấy config từ TrainingOptions
+            // get config in TrainingOptions
             const options = this.options.getCurrentOptions();
             
-            // Cập nhật model info
-            this.results.tagModel.textContent = options.model
-            this.results.tagParams.textContent = options.params || '2.4M'
-            this.results.tagTime.textContent = `~${this.progress.totalEpochs * 2}s`
-            this.results.tagTask.textContent = options.task
+            // update model info
+            const time = `~${this.progress.totalEpochs * 2}s`
+            this.results.updateInfo(options, time);
         }
     }
 }

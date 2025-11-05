@@ -23,7 +23,6 @@ export class TrainingResults {
         }
     }
 
-
     updateEpoch(epoch) {
         const el = document.getElementById('trainingTitleEpoch');
         // the HTML contains the word "Epoch" and the span should only contain the number
@@ -191,11 +190,17 @@ export class TrainingResults {
         this.valLossHistory = [];
         this.updateLossChart();
 
-        if(this.tagModel) this.tagModel.textContent = '-';
-        if(this.tagParams) this.tagParams.textContent = '-';
-        if(this.tagTime) this.tagTime.textContent = '-';
-        if(this.tagTask) this.tagTask.textContent = '-';
+        if(this.tagModel) this.tagModel.textContent = '';
+        if(this.tagParams) this.tagParams.textContent = '';
+        if(this.tagTime) this.tagTime.textContent = '';
+        if(this.tagTask) this.tagTask.textContent = '';
     
     }
 
+    updateInfo(options, time) {
+        if(this.tagModel) this.tagModel.textContent = String(options.model);
+        if(this.tagParams) this.tagParams.textContent = String(options.params);
+        if(this.tagTime) this.tagTime.textContent = time;
+        if(this.tagTask) this.tagTask.textContent = String(options.task);
+    }
 }
