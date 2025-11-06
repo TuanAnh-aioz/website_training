@@ -213,16 +213,22 @@ export class TrainingOptions {
         this.expandedId = null;
         this.elements.trainBtn.classList.toggle("active", mode === "train");
         this.elements.valBtn.classList.toggle("active", mode === "val");
+        this.populateTransforms();
         this.renderTransforms();
     }
 
     populateTransforms() {
         this.elements.transformSelect.innerHTML = '<option value="">Select a transform...</option>';
+        const currentTransforms = this.getCurrentTransforms();
+        const addedTransforms = currentTransforms.map(t => t.name);
+
         Object.keys(AVAILABLE_TRANSFORMS).forEach(t => {
-            const option = document.createElement("option");
-            option.value = t;
-            option.textContent = AVAILABLE_TRANSFORMS[t].label;
-            this.elements.transformSelect.appendChild(option);
+            if (!addedTransforms.includes(t)) {
+                const option = document.createElement("option");
+                option.value = t;
+                option.textContent = AVAILABLE_TRANSFORMS[t].label;
+                this.elements.transformSelect.appendChild(option);
+            }
         });
     }
 
@@ -248,6 +254,8 @@ export class TrainingOptions {
         this.setCurrentTransforms(current);
 
         this.elements.transformSelect.value = '';
+
+        this.populateTransforms();
         this.renderTransforms();
     }
 
