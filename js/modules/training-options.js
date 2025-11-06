@@ -181,6 +181,7 @@ export class TrainingOptions {
         const t = this.elements.taskType.value || 'classification';
         this.elements.modelSelect.innerHTML = '';
 
+        // placeholder
         const placeholder = document.createElement('option');
         placeholder.value = "";
         placeholder.textContent = "Select a model...";
@@ -195,6 +196,13 @@ export class TrainingOptions {
             option.textContent = cfg.label;
             this.elements.modelSelect.appendChild(option);
         });
+
+        const thresholdGroup = document.getElementById('threshold-group');
+        if (t === 'detection') {
+            thresholdGroup.style.display = 'block';
+        } else {
+            thresholdGroup.style.display = 'none';
+        }
     }
 
     setMode(mode) {
