@@ -181,7 +181,6 @@ export class TrainingOptions {
         const t = this.elements.taskType.value || 'classification';
         this.elements.modelSelect.innerHTML = '';
 
-        // ✅ thêm option mặc định
         const placeholder = document.createElement('option');
         placeholder.value = "";
         placeholder.textContent = "Select a model...";

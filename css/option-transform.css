@@ -81,17 +81,16 @@
 }
 
 .btn-mode {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  background: #374151;
-  color: white;
-  font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #bfe6ff;
+    cursor: pointer;
 }
 
 .btn-mode.active {
-  background: #2563eb;
+  background: #4b5563;
 }
 
 .transform-container {
@@ -113,7 +112,7 @@
 
 .btn-add {
   padding: 8px 12px;
-  background-color: #3182ce;
+  background-color: #4a5568;
   color: white;
   border-radius: 6px;
   cursor: pointer;
