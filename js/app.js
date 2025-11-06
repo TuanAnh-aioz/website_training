@@ -113,7 +113,8 @@ class App {
 
             // get config in TrainingOptions
             const options = this.options.getCurrentOptions();
-            
+            // const config = this.options.buildTrainingConfig(options)
+
             // update model info
             const time = `~${this.progress.totalEpochs * 2}s`
             this.results.updateInfo(options, time);

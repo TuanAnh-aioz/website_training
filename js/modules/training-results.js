@@ -198,20 +198,19 @@ export class TrainingResults {
     formatModelName(name) {
         if (!name) return "";
         return name
-            .split('_')                       
-            .map(word => 
+            .split('_')
+            .map(word =>
                 word
-                    .replace(/([a-z])([A-Z])/g, "$1$2") 
-                    .replace(/^\w/, c => c.toUpperCase()) 
+                    .replace(/([a-z])([A-Z])/g, "$1 $2") 
+                    .replace(/^\w/, c => c.toUpperCase())
             )
-            .join(' ');                        
+            .join(' ');
     }
-
 
     updateInfo(options, time) {
         if(this.tagModel) this.tagModel.textContent = this.formatModelName(options.model);
         if(this.tagParams) this.tagParams.textContent = String(options.params);
-        if(this.tagTime) this.tagTime.textContent = time;
+        if(this.tagTime) this.tagTime.textContent = String(time);
         if(this.tagTask) this.tagTask.textContent = this.formatModelName(options.task);
     }
 }

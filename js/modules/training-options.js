@@ -321,19 +321,84 @@ export class TrainingOptions {
     }
 
     getCurrentOptions() {
-        console.log("option:", this)
-        return {
-            model: this.elements.modelSelect?.value || 'Unknown',
-            task: this.elements.taskType?.value || 'Classification',
-            dataset: this.elements.datasetSelect?.value || '',
-            optimizer: this.optimizers[0]?.name || '',
-            scheduler: this.schedulers[0]?.name || '',
-            loss: this.elements.lossSelect?.value || '',
-            epochs: Number(this.elements.epochs?.value) || 5,
-            batchSize: Number(this.elements.batchSize?.value) || 32,
-            learningRate: Number(this.elements.learningRate?.value) || 0.001,
-            pretrained: this.elements.pretrained?.checked || false,
+        const result = {
+            model: this.elements.modelSelect?.value,
+            task: this.elements.taskType?.value,
+            dataset: this.elements.datasetSelect?.value,
+            transforms: this.transformsData,
+            optimizer: this.optimizers,
+            scheduler: this.schedulers,
+            loss: this.elements.lossSelect?.value,
+            epochs: Number(this.elements.epochs?.value),
+            batchSize: Number(this.elements.batchSize?.value),
+            learningRate: Number(this.elements.learningRate?.value),
+            pretrained: this.elements.pretrained?.checked,
             params: '21.1M'
         };
+        return result
     }
+
+    buildTrainingConfig(options) {
+        // ⚙️ Build model section
+        const model = {
+            name: options.model,
+            pretrained: !!options.pretrained,
+        };
+
+        // ⚙️ Build dataset section
+        const dataset = {
+            name: options.dataset,
+            batch_size: Number(options.batchSize) || 4,
+            num_workers: 0,
+            val_ratio: 0.3,
+            transforms: options.transforms
+        };
+
+        // ⚙️ Build optimizer
+        let optimizer = null;
+        if (options.optimizer && options.optimizer.length > 0) {
+            const opt = options.optimizer[0];
+            const { lr, ...otherParams } = opt.params || {};
+            optimizer = {
+                type: opt.name,
+                lr: opt.params.lr,
+                params: otherParams,
+            };
+        }
+
+        // ⚙️ Build scheduler
+        let scheduler = null;
+        if (options.scheduler && options.scheduler.length > 0) {
+            const sch = options.scheduler[0];
+            scheduler = {
+                type: sch.name,
+                params: sch.params || {},
+            };
+        }
+
+        // ⚙️ Build loss
+        const loss = {
+            type: options.loss || "CrossEntropyLoss",
+            params: {
+                label_smoothing: 0.1,
+            },
+        };
+
+        // ⚙️ Compose final JSON
+        const config = {
+            task: options.task || "classification",
+            model,
+            dataset,
+            epochs: Number(options.epochs) || 10,
+            optimizer,
+            scheduler,
+            loss,
+            log_interval: 20,
+            threshold: 0,
+        };
+
+        return config;
+    }
+
+
 }
