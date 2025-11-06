@@ -3,6 +3,7 @@
   <div class="form-group">
     <label for="taskType">Task</label>
     <select id="taskType">
+      <option value="">Select an task ...</option>
       <option value="classification">Classification</option>
       <option value="detection">Detection</option>
     </select>
@@ -11,6 +12,7 @@
   <div class="form-group">
     <label for="datasetSelect">Dataset</label>
     <select id="datasetSelect">
+      <option value="">Select an dataset ...</option>
       <option value="cat_dog">Cat &amp; Dog</option>
       <option value="traffic_light">Traffic Light</option>
       <option value="coco">COCO</option>
@@ -76,7 +78,8 @@
   <div class="form-group">
     <label for="lossSelect">Loss Function</label>
     <select id="lossSelect">
-      <option selected>CrossEntropyLoss</option>
+      <option value="">Select a loss function ...</option>
+      <option>CrossEntropyLoss</option>
       <option>FocalLoss</option>
       <option>BCELoss</option>
       <option>MSELoss</option>
@@ -86,18 +89,18 @@
   <div class="form-group two-col">
     <div>
       <label for="learningRate">Learning Rate</label>
-      <input id="learningRate" type="text" value="0.001">
+      <input id="learningRate" type="text" value="0.0">
     </div>
     <div>
       <label for="batchSize">Batch Size</label>
-      <input id="batchSize" type="text" value="32">
+      <input id="batchSize" type="text" value="0">
     </div>
   </div>
 
     <div class="form-group two-col">
     <div>
       <label for="epochs">Epochs</label>
-        <input id="epochs" type="number" min="1" value="5">
+        <input id="epochs" type="number" min="1" value="0">
     </div>
     <div class="checkbox-row">
       <label for="pretrained">Pretrained</label>

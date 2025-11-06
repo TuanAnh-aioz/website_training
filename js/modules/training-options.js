@@ -93,7 +93,6 @@ export class TrainingOptions {
         };
         available[name].params.forEach(p => newItem.params[p.name] = p.default);
 
-        // Chỉ giữ 1 item
         if (type === 'optimizer') this.optimizers = [newItem];
         else this.schedulers = [newItem];
 
@@ -181,6 +180,15 @@ export class TrainingOptions {
     populateModels() {
         const t = this.elements.taskType.value || 'classification';
         this.elements.modelSelect.innerHTML = '';
+
+        // ✅ thêm option mặc định
+        const placeholder = document.createElement('option');
+        placeholder.value = "";
+        placeholder.textContent = "Select a model...";
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        this.elements.modelSelect.appendChild(placeholder);
+
         const models = AVAILABLE_MODELS[t];
         Object.entries(models).forEach(([key, cfg]) => {
             const option = document.createElement('option');
@@ -314,6 +322,7 @@ export class TrainingOptions {
     }
 
     getCurrentOptions() {
+        console.log("option:", this)
         return {
             model: this.elements.modelSelect?.value || 'Unknown',
             task: this.elements.taskType?.value || 'Classification',
