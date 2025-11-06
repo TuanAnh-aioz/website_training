@@ -289,3 +289,30 @@ body{
   border-radius: 8px;
   font-family: "Courier New", Courier, monospace;
 }
+
+.btn-settings, .btn-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  color: #9ca3af;
+  transition: all 0.2s ease;
+}
+
+.btn-settings:hover {
+  color: #3b82f6;
+  background: rgba(59,130,246,0.1);
+}
+
+.btn-delete:hover {
+  color: #ef4444;
+  background: rgba(239,68,68,0.1);
+}
+
+.btn-settings svg, .btn-delete svg,
+.btn-settings i, .btn-delete i {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
