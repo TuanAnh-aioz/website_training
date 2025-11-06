@@ -21,13 +21,18 @@
   <div class="form-group">
     <label for="transformSelect">Transforms</label>
 
+    <div class="transform-mode-toggle flex gap-2 mb-2">
+      <button id="trainMode" class="btn-mode active">Train</button>
+      <button id="valMode" class="btn-mode">Val</button>
+    </div>
+
     <div id="transformContainer" class="transform-container"></div>
 
-    <div class="transform-add">
-      <select id="transformSelect">
+    <div class="transform-add mt-4 flex gap-2">
+      <select id="transformSelect" class="transform-select">
         <option value="">Select a transform...</option>
       </select>
-      <button id="addTransform" type="button">+</button>
+      <button id="addTransform" type="button" class="btn-add">+</button>
     </div>
 
     <pre id="transformPreview" class="transform-preview"></pre>

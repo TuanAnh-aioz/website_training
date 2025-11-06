@@ -233,3 +233,59 @@ body{
   max-height: 120px;
   overflow-y: auto;
 }
+
+/* Button cho chế độ Train/Val */
+.btn-mode {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #374151;
+  color: white;
+  font-size: 12px;
+}
+
+.btn-mode.active {
+  background: #2563eb;
+}
+
+/* Container chứa các transform */
+.transform-container {
+  margin-top: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #2d3748;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+/* Select thêm transform mới */
+.transform-select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #4a5568;
+  background: #1a202c;
+  color: white;
+}
+
+/* Button thêm transform mới */
+.btn-add {
+  padding: 8px 12px;
+  background-color: #3182ce;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Preview JSON */
+.transform-preview {
+  margin-top: 10px;
+  padding: 10px;
+  background: #1a202c;
+  color: white;
+  font-size: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 8px;
+  font-family: "Courier New", Courier, monospace;
+}

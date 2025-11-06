@@ -9,47 +9,51 @@ const MODELS = {
 };
 
 const AVAILABLE_TRANSFORMS = {
-  resize: {
-    label: "Resize",
-    params: [
-      { name: "width", type: "number", default: 224 },
-      { name: "height", type: "number", default: 224 },
-      {
-        name: "interpolation",
-        type: "select",
-        default: "bilinear",
-        options: ["nearest", "bilinear", "bicubic", "lanczos"],
-      },
-    ],
-  },
-  normalize: {
-    label: "Normalize",
-    params: [
-      { name: "mean", type: "text", default: "0.485,0.456,0.406" },
-      { name: "std", type: "text", default: "0.229,0.224,0.225" },
-    ],
-  },
-  horizontal_flip: {
-    label: "Horizontal Flip",
-    params: [{ name: "probability", type: "number", default: 0.5 }],
-  },
-  vertical_flip: {
-    label: "Vertical Flip",
-    params: [{ name: "probability", type: "number", default: 0.5 }],
-  },
-  rotation: {
-    label: "Rotation",
-    params: [
-      { name: "degrees", type: "number", default: 15 },
-      { name: "probability", type: "number", default: 0.5 },
-    ],
-  },
+    resize: {
+        label: "Resize",
+        params: [
+            { name: "width", type: "number", default: 224 },
+            { name: "height", type: "number", default: 224 },
+            {
+                name: "interpolation",
+                type: "select",
+                default: "bilinear",
+                options: ["nearest", "bilinear", "bicubic", "lanczos"],
+            },
+        ],
+    },
+    normalize: {
+        label: "Normalize",
+        params: [
+            { name: "mean", type: "text", default: "0.485,0.456,0.406" },
+            { name: "std", type: "text", default: "0.229,0.224,0.225" },
+        ],
+    },
+    horizontal_flip: {
+        label: "Horizontal Flip",
+        params: [{ name: "probability", type: "number", default: 0.5 }],
+    },
+    vertical_flip: {
+        label: "Vertical Flip",
+        params: [{ name: "probability", type: "number", default: 0.5 }],
+    },
+    rotation: {
+        label: "Rotation",
+        params: [
+            { name: "degrees", type: "number", default: 15 },
+            { name: "probability", type: "number", default: 0.5 },
+        ],
+    },
 };
 
 export class TrainingOptions {
     constructor() {
+        this.trainTransforms = [];
+        this.valTransforms = [];
         this.transforms = [];
         this.expandedId = null;
+        this.currentMode = "train"; 
+
         this.initializeElements();
     }
 
@@ -71,6 +75,9 @@ export class TrainingOptions {
             this.addTransformBtn = document.getElementById("addTransform");
             this.preview = document.getElementById("transformPreview");
 
+            this.trainBtn = document.getElementById("trainMode");
+            this.valBtn = document.getElementById("valMode");
+
             if (this.taskType && this.modelSelect) {
                 clearInterval(initInterval);
                 this.taskType.addEventListener('change', () => {
@@ -79,16 +86,50 @@ export class TrainingOptions {
                 this.populateModels();
             }
 
-            if (this.transformSelect && this.addTransformBtn) {
+            if (this.transformSelect && this.addTransformBtn && this.trainBtn && this.valBtn) {
                 clearInterval(initInterval);
-                this.populateTransforms();
-                this.addTransformBtn.addEventListener("click", () =>
-                this.addTransform()
-                );
+
+                this.trainBtn.addEventListener("click", () => this.setMode("train"));
+                this.valBtn.addEventListener("click", () => this.setMode("val"));
+
+                this.addTransformBtn.addEventListener("click", () => this.addTransform());
+
                 this.renderTransforms();
             }
 
         }, 100);
+    }
+    
+    setMode(mode) {
+        this.currentMode = mode;
+        this.expandedId = null; 
+        this.trainBtn.classList.toggle("active", mode === "train");
+        this.valBtn.classList.toggle("active", mode === "val");
+        // Cập nhật lại danh sách transforms dựa trên chế độ hiện tại
+        this.populateTransforms(); 
+        this.renderTransforms(); // Render lại transforms cho chế độ hiện tại
+    }
+
+    populateTransforms() {
+        // Reset các option trong select box
+        this.transformSelect.innerHTML = '<option value="">Select a transform...</option>';
+
+        // Sử dụng AVAILABLE_TRANSFORMS cho cả train và val
+        Object.keys(AVAILABLE_TRANSFORMS).forEach(t => {
+            const option = document.createElement("option");
+            option.value = t;
+            option.textContent = AVAILABLE_TRANSFORMS[t].label;
+            this.transformSelect.appendChild(option);
+        });
+    }
+
+    getCurrentTransforms() {
+        return this.currentMode === "train" ? this.trainTransforms : this.valTransforms;
+    }
+
+    setCurrentTransforms(transforms) {
+        if (this.currentMode === "train") this.trainTransforms = transforms;
+        else this.valTransforms = transforms;
     }
 
     populateModels() {
@@ -110,58 +151,57 @@ export class TrainingOptions {
         const params = {};
         cfg.params.forEach(p => (params[p.name] = p.default));
 
-        this.transforms.push({
-        id: Date.now(),
-        name: value,
-        enabled: true,
-        params
-        });
+        const newTransform = {
+            id: Date.now(),
+            name: value,
+            params
+        };
+
+        const current = this.getCurrentTransforms();
+        current.push(newTransform);
+        this.setCurrentTransforms(current);
 
         this.transformSelect.value = "";
         this.renderTransforms();
     }
 
-
     removeTransform(id) {
-        this.transforms = this.transforms.filter(t => t.id !== id);
+        let current = this.getCurrentTransforms();
+        current = current.filter(t => t.id !== id);
+        this.setCurrentTransforms(current);
         if (this.expandedId === id) this.expandedId = null;
         this.renderTransforms();
     }
 
-    toggleTransform(id) {
-        const t = this.transforms.find(t => t.id === id);
-        if (t) t.enabled = !t.enabled;
-        this.renderTransforms(false);
-    }
 
     toggleParamPanel(id) {
         this.expandedId = this.expandedId === id ? null : id;
-        this.renderTransforms(false);
+        this.renderTransforms();
     }
 
     updateParam(id, paramName, value) {
-        const t = this.transforms.find(t => t.id === id);
-        if (t) {
-        t.params[paramName] = value;
+        const current = this.getCurrentTransforms();
+        const t = current.find(t => t.id === id);
+        if (t) t.params[paramName] = value;
+        this.setCurrentTransforms(current);
         this.renderTransforms(false);
-        }
     }
 
-    renderTransforms() {
-        this.transformContainer.innerHTML = "";
+    renderTransforms(refresh = true) {
+        if (refresh) this.transformContainer.innerHTML = "";
 
-        if (this.transforms.length === 0) {
+        const transforms = this.getCurrentTransforms();
+        if (transforms.length === 0) {
             this.transformContainer.innerHTML = '<p style="color:#9ca3af;font-size:12px;text-align:center;">No transforms added.</p>';
             this.preview.textContent = '';
             return;
         }
 
-        this.transforms.forEach(t => {
+        transforms.forEach(t => {
             const cfg = AVAILABLE_TRANSFORMS[t.name];
             const div = document.createElement("div");
             div.className = "transform-item";
 
-            // Header chỉ hiển thị tên + Settings + Delete
             const header = document.createElement("div");
             header.className = "transform-header";
             header.innerHTML = `
@@ -195,7 +235,7 @@ export class TrainingOptions {
                         i.type = p.type === "number" ? "number" : "text";
                         i.value = t.params[p.name];
                         i.addEventListener("input", e =>
-                            this.updateParam(t.id, p.name, p.type === "number" ? parseFloat(e.target.value) : e.target.value)
+                        this.updateParam(t.id, p.name, p.type === "number" ? parseFloat(e.target.value) : e.target.value)
                         );
                         g.appendChild(i);
                     }
@@ -206,17 +246,8 @@ export class TrainingOptions {
             this.transformContainer.appendChild(div);
         });
 
-        this.preview.textContent = JSON.stringify(this.transforms, null, 2);
-        }
-
-    populateTransforms() {
-        this.transformSelect.innerHTML = '<option value="">Select a transform...</option>';
-        Object.entries(AVAILABLE_TRANSFORMS).forEach(([key, cfg]) => {
-        const opt = document.createElement("option");
-        opt.value = key;
-        opt.textContent = cfg.label;
-        this.transformSelect.appendChild(opt);
-        });
+        // Preview JSON
+        this.preview.textContent = JSON.stringify(transforms, null, 2);
     }
 
     getCurrentOptions() {
