@@ -18,9 +18,12 @@ export class TrainingOptions {
         const selectors = {
             taskType: 'taskType',
             modelSelect: 'modelSelect',
+            threshold: 'threshold',
             schedulerSelect: 'schedulerSelect',
             lossSelect: 'lossSelect',
             datasetSelect: 'datasetSelect',
+            valRatio: 'valRatio',
+            numberWroker: 'numberWroker',
             learningRate: 'learningRate',
             batchSize: 'batchSize',
             epochs: 'epochs',
@@ -329,11 +332,15 @@ export class TrainingOptions {
     }
 
     getCurrentOptions() {
+        console.log("this option:", this)
         const result = {
             model: this.elements.modelSelect?.value,
             task: this.elements.taskType?.value,
             dataset: this.elements.datasetSelect?.value,
+            valRatio: Number(this.elements.valRatio?.value),
             transforms: this.transformsData,
+            threshold: Number(this.elements.threshold?.value),
+            numberWroker: Number(this.elements.numberWroker?.value),
             optimizer: this.optimizers,
             scheduler: this.schedulers,
             loss: this.elements.lossSelect?.value,
@@ -357,8 +364,8 @@ export class TrainingOptions {
         const dataset = {
             name: options.dataset,
             batch_size: Number(options.batchSize) || 4,
-            num_workers: 0,
-            val_ratio: 0.3,
+            num_workers: options.numberWroker,
+            val_ratio: options.valRatio,
             transforms: options.transforms
         };
 
@@ -402,7 +409,7 @@ export class TrainingOptions {
             scheduler,
             loss,
             log_interval: 20,
-            threshold: 0,
+            threshold: options.threshold || 0,
         };
 
         return config;

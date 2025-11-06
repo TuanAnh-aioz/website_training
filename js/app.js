@@ -98,11 +98,11 @@ class App {
         const valLoss = Math.max(0.2, loss - (Math.random()*0.2)).toFixed(3);
 
         this.progress.updateProgress(this.progress.epoch, loss, acc + '%', valLoss);
-    this.logs.log(`Epoch ${this.progress.epoch}/${this.progress.totalEpochs} — Loss: ${loss} — Accuracy: ${acc}%`);
-        
-    this.results.updateLossHistory(loss, valLoss);
-    // update epoch shown in the Model Loss card
-    if(typeof this.results.updateEpoch === 'function') this.results.updateEpoch(this.progress.epoch);
+        this.logs.log(`Epoch ${this.progress.epoch}/${this.progress.totalEpochs} — Loss: ${loss} — Accuracy: ${acc}%`);
+            
+        this.results.updateLossHistory(loss, valLoss);
+        // update epoch shown in the Model Loss card
+        if(typeof this.results.updateEpoch === 'function') this.results.updateEpoch(this.progress.epoch);
 
         if(this.progress.epoch < this.progress.totalEpochs) {
             setTimeout(() => this.step(), 600 + Math.random()*600);
@@ -113,8 +113,10 @@ class App {
 
             // get config in TrainingOptions
             const options = this.options.getCurrentOptions();
-            // const config = this.options.buildTrainingConfig(options)
-
+            console.log("options:", options)
+            const config = this.options.buildTrainingConfig(options)
+            console.log("config:", config)
+            
             // update model info
             const time = `~${this.progress.totalEpochs * 2}s`
             this.results.updateInfo(options, time);
