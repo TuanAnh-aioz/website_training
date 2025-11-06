@@ -25,9 +25,7 @@ export class TrainingResults {
 
     updateEpoch(epoch) {
         const el = document.getElementById('trainingTitleEpoch');
-        // the HTML contains the word "Epoch" and the span should only contain the number
         if (el) el.textContent = String(epoch);
-        // remove legacy small element update (no longer used)
     }
 
     downloadChart() {
@@ -197,10 +195,23 @@ export class TrainingResults {
     
     }
 
+    formatModelName(name) {
+        if (!name) return "";
+        return name
+            .split('_')                       
+            .map(word => 
+                word
+                    .replace(/([a-z])([A-Z])/g, "$1$2") 
+                    .replace(/^\w/, c => c.toUpperCase()) 
+            )
+            .join(' ');                        
+    }
+
+
     updateInfo(options, time) {
-        if(this.tagModel) this.tagModel.textContent = String(options.model);
+        if(this.tagModel) this.tagModel.textContent = this.formatModelName(options.model);
         if(this.tagParams) this.tagParams.textContent = String(options.params);
         if(this.tagTime) this.tagTime.textContent = time;
-        if(this.tagTask) this.tagTask.textContent = String(options.task);
+        if(this.tagTask) this.tagTask.textContent = this.formatModelName(options.task);
     }
 }
