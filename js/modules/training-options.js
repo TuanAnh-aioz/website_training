@@ -1,4 +1,3 @@
-// Training options module
 import { AVAILABLE_TRANSFORMS } from "./param/transforms.js";
 import { AVAILABLE_MODELS } from "./param/models.js";
 import { AVAILABLE_OPTIMIZERS } from "./param/optimizers.js";
@@ -6,375 +5,270 @@ import { AVAILABLE_SCHEDULERS } from "./param/schedulers.js";
 
 export class TrainingOptions {
     constructor() {
-        this.trainTransforms = [];
-        this.valTransforms = [];
-        this.transforms = [];
+        this.currentMode = "train";
         this.expandedId = null;
-        this.currentMode = "train"; 
-
-        this.initializeElements();
+        this.transformsData = { train: [], val: [] };
+        this.optimizers = [];
+        this.schedulers = [];
+        this.elements = {}; 
+        this.initElements();
     }
 
-    initializeElements() {
+    initElements() {
+        const selectors = {
+            taskType: 'taskType',
+            modelSelect: 'modelSelect',
+            schedulerSelect: 'schedulerSelect',
+            lossSelect: 'lossSelect',
+            datasetSelect: 'datasetSelect',
+            learningRate: 'learningRate',
+            batchSize: 'batchSize',
+            epochs: 'epochs',
+            pretrained: 'pretrained',
+            transformSelect: 'transformSelect',
+            transformContainer: 'transformContainer',
+            addTransformBtn: 'addTransform',
+            transformPreview: 'transformPreview',
+            trainBtn: 'trainMode',
+            valBtn: 'valMode',
+            optimizerSelect: 'optimizerSelect',
+            addOptimizerBtn: 'addOptimizer',
+            optimizerContainer: 'optimizerContainer',
+            schedulerSelect: 'schedulerSelect',
+            addSchedulerBtn: 'addScheduler',
+            schedulerContainer: 'schedulerContainer'
+        };
+
         const initInterval = setInterval(() => {
-            this.taskType = document.getElementById('taskType');
-            this.modelSelect = document.getElementById('modelSelect');
-            this.schedulerSelect = document.getElementById('schedulerSelect');
-            this.lossSelect = document.getElementById('lossSelect');
-            this.datasetSelect = document.getElementById('datasetSelect');
-            this.learningRate = document.getElementById('learningRate');
-            this.batchSize = document.getElementById('batchSize');
-            this.epochs = document.getElementById('epochs');
-            this.pretrained = document.getElementById('pretrained');
-            
-            this.transformSelect = document.getElementById("transformSelect");
-            this.transformContainer = document.getElementById("transformContainer");
-            this.addTransformBtn = document.getElementById("addTransform");
-            this.preview = document.getElementById("transformPreview");
-
-            this.trainBtn = document.getElementById("trainMode");
-            this.valBtn = document.getElementById("valMode");
-
-            if (this.taskType && this.modelSelect) {
-                clearInterval(initInterval);
-                this.taskType.addEventListener('change', () => {
-                    this.populateModels();
-                });
-                this.populateModels();
-            }
-
-            if (this.transformSelect && this.addTransformBtn && this.trainBtn && this.valBtn) {
-                clearInterval(initInterval);
-
-                this.trainBtn.addEventListener("click", () => this.setMode("train"));
-                this.valBtn.addEventListener("click", () => this.setMode("val"));
-
-                this.addTransformBtn.addEventListener("click", () => this.addTransform());
-
-                this.renderTransforms();
-            }
-
-            this.optimizerSelect = document.getElementById('optimizerSelect');
-            this.addOptimizerBtn = document.getElementById('addOptimizer');
-            this.optimizerContainer = document.getElementById('optimizerContainer');
-            this.optimizers = [];
-            
-            Object.keys(AVAILABLE_OPTIMIZERS).forEach(key => {
-                const opt = AVAILABLE_OPTIMIZERS[key];
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = opt.label;
-                this.optimizerSelect.appendChild(option);
+            let allFound = true;
+            Object.entries(selectors).forEach(([key, id]) => {
+                const el = document.getElementById(id);
+                if (!el) allFound = false;
+                this.elements[key] = el;
             });
 
-            // Add button
-            this.addOptimizerBtn.addEventListener('click', () => {
-                const optName = this.optimizerSelect.value;
-                if (!optName) return;
+            if (!allFound) return;
 
-                const newId = Date.now().toString();
-                const params = {};
-                AVAILABLE_OPTIMIZERS[optName].params.forEach(p => params[p.name] = p.default);
+            clearInterval(initInterval);
 
-                this.optimizers = [  
-                    {
-                        id: newId,
-                        name: optName,
-                        params
-                    }
-                ];
+            // Event listeners
+            this.elements.taskType.addEventListener('change', () => this.populateModels());
+            this.elements.trainBtn.addEventListener('click', () => this.setMode("train"));
+            this.elements.valBtn.addEventListener('click', () => this.setMode("val"));
+            this.elements.addTransformBtn.addEventListener('click', () => this.addTransform());
+            this.populateModels();
+            this.populateTransforms();
+            this.populateDropdown(this.elements.optimizerSelect, AVAILABLE_OPTIMIZERS);
+            this.populateDropdown(this.elements.schedulerSelect, AVAILABLE_SCHEDULERS);
 
-                this.renderOptimizers();
-            });
-            this.renderOptimizers();
+            this.elements.addOptimizerBtn.addEventListener('click', () => this.addSingleItem('optimizer'));
+            this.elements.addSchedulerBtn.addEventListener('click', () => this.addSingleItem('scheduler'));
 
-            this.schedulerSelect = document.getElementById('schedulerSelect');
-            this.addSchedulerBtn = document.getElementById('addScheduler');
-            this.schedulerContainer = document.getElementById('schedulerContainer');
-            this.schedulers = [];
-            
-            Object.keys(AVAILABLE_SCHEDULERS).forEach(key => {
-                const opt = AVAILABLE_SCHEDULERS[key];
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = opt.label;
-                this.schedulerSelect.appendChild(option);
-            });
-
-            // Add button
-            this.addSchedulerBtn.addEventListener('click', () => {
-                const slName = this.schedulerSelect.value;
-                if (!slName) return;
-
-                const newId = Date.now().toString();
-                const params = {};
-                AVAILABLE_SCHEDULERS[slName].params.forEach(p => params[p.name] = p.default);
-
-                this.schedulers = [  
-                    {
-                        id: newId,
-                        name: slName,
-                        params
-                    }
-                ];
-
-                this.renderSchedulers();
-            });
-            this.renderSchedulers();
-
-
+            this.renderAll();
         }, 100);
     }
 
-    renderOptimizers() {
-        this.optimizerContainer.innerHTML = '';
+    populateDropdown(selectEl, data) {
+        Object.keys(data).forEach(key => {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = data[key].label;
+            selectEl.appendChild(opt);
+        });
+    }
 
-        if (this.optimizers.length === 0) {
+    addSingleItem(type) {
+        const key = type === 'optimizer' ? 'optimizerSelect' : 'schedulerSelect';
+        const containerKey = type === 'optimizer' ? 'optimizerContainer' : 'schedulerContainer';
+        const available = type === 'optimizer' ? AVAILABLE_OPTIMIZERS : AVAILABLE_SCHEDULERS;
+        const list = type === 'optimizer' ? this.optimizers : this.schedulers;
+
+        const name = this.elements[key].value;
+        if (!name) return;
+
+        const newItem = {
+            id: Date.now().toString(),
+            name,
+            params: {}
+        };
+        available[name].params.forEach(p => newItem.params[p.name] = p.default);
+
+        // Chỉ giữ 1 item
+        if (type === 'optimizer') this.optimizers = [newItem];
+        else this.schedulers = [newItem];
+
+        this.renderItems(containerKey, list, available);
+    }
+
+    renderItems(containerKey, items, available) {
+        const container = this.elements[containerKey];
+        container.innerHTML = '';
+
+        if (items.length === 0) {
             const p = document.createElement('p');
-            p.className = 'no-optimizer';
-            p.textContent = 'No optimizers added.';
-            this.optimizerContainer.appendChild(p);
+            p.className = `no-${containerKey.replace('Container','')}`;
+            p.textContent = `No ${containerKey.replace('Container','')} added.`;
+            container.appendChild(p);
             return;
         }
 
-        this.optimizers.forEach(opt => {
+        items.forEach(item => {
             const div = document.createElement('div');
-            div.className = 'optimizer-item';
+            div.className = `${containerKey.replace('Container','')}-item`;
 
-            // Header
             const header = document.createElement('div');
-            header.className = 'optimizer-header';
+            header.className = `${containerKey.replace('Container','')}-header`;
 
             const nameSpan = document.createElement('span');
-            nameSpan.textContent = AVAILABLE_OPTIMIZERS[opt.name].label;
+            nameSpan.textContent = available[item.name].label;
 
             const btnContainer = document.createElement('div');
-            btnContainer.className = 'optimizer-buttons';
+            btnContainer.className = `${containerKey.replace('Container','')}-buttons`;
 
             const btnSettings = document.createElement('button');
             btnSettings.className = 'btn-settings';
             btnSettings.textContent = '⚙';
             btnSettings.title = 'Settings';
-            btnSettings.addEventListener('click', () => {
-                paramsPanel.style.display = paramsPanel.style.display === 'none' ? 'block' : 'none';
-            });
 
             const btnDelete = document.createElement('button');
             btnDelete.className = 'btn-delete';
             btnDelete.textContent = '✖';
             btnDelete.title = 'Remove';
             btnDelete.addEventListener('click', () => {
-                this.optimizers = this.optimizers.filter(o => o.id !== opt.id);
-                this.renderOptimizers();
+                if (containerKey === 'optimizerContainer') this.optimizers = [];
+                else this.schedulers = [];
+                this.renderItems(containerKey, containerKey === 'optimizerContainer' ? this.optimizers : this.schedulers, available);
             });
 
             btnContainer.appendChild(btnSettings);
             btnContainer.appendChild(btnDelete);
-
             header.appendChild(nameSpan);
             header.appendChild(btnContainer);
 
             div.appendChild(header);
 
-            // Params panel
             const paramsPanel = document.createElement('div');
             paramsPanel.className = 'params-panel';
-            AVAILABLE_OPTIMIZERS[opt.name].params.forEach(p => {
+            available[item.name].params.forEach(p => {
                 const g = document.createElement('div');
                 g.className = 'param-group';
                 g.innerHTML = `<label>${p.label}</label>`;
                 const input = document.createElement('input');
                 input.type = p.type;
-                input.value = opt.params[p.name];
+                input.value = item.params[p.name];
                 input.addEventListener('input', e => {
-                    opt.params[p.name] = p.type === 'number' ? parseFloat(e.target.value) : e.target.value;
+                    item.params[p.name] = p.type === 'number' ? parseFloat(e.target.value) : e.target.value;
                 });
                 g.appendChild(input);
                 paramsPanel.appendChild(g);
             });
-
             div.appendChild(paramsPanel);
-            this.optimizerContainer.appendChild(div);
-        });
-    }
 
-    renderSchedulers() {
-        this.schedulerContainer.innerHTML = '';
-
-        if (this.schedulers.length === 0) {
-            const p = document.createElement('p');
-            p.className = 'no-scheduler';
-            p.textContent = 'No schedulers added.';
-            this.schedulerContainer.appendChild(p);
-            return;
-        }
-
-        this.schedulers.forEach(opt => {
-            const div = document.createElement('div');
-            div.className = 'scheduler-item';
-
-            // Header
-            const header = document.createElement('div');
-            header.className = 'scheduler-header';
-
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = AVAILABLE_SCHEDULERS[opt.name].label;
-
-            const btnContainer = document.createElement('div');
-            btnContainer.className = 'scheduler-buttons';
-
-            const btnSettings = document.createElement('button');
-            btnSettings.className = 'btn-settings';
-            btnSettings.textContent = '⚙';
-            btnSettings.title = 'Settings';
             btnSettings.addEventListener('click', () => {
                 paramsPanel.style.display = paramsPanel.style.display === 'none' ? 'block' : 'none';
             });
 
-            const btnDelete = document.createElement('button');
-            btnDelete.className = 'btn-delete';
-            btnDelete.textContent = '✖';
-            btnDelete.title = 'Remove';
-            btnDelete.addEventListener('click', () => {
-                this.schedulers = this.schedulers.filter(o => o.id !== opt.id);
-                this.renderSchedulers();
-            });
-
-            btnContainer.appendChild(btnSettings);
-            btnContainer.appendChild(btnDelete);
-
-            header.appendChild(nameSpan);
-            header.appendChild(btnContainer);
-
-            div.appendChild(header);
-
-            // Params panel
-            const paramsPanel = document.createElement('div');
-            paramsPanel.className = 'params-panel';
-            AVAILABLE_SCHEDULERS[opt.name].params.forEach(p => {
-                const g = document.createElement('div');
-                g.className = 'param-group';
-                g.innerHTML = `<label>${p.label}</label>`;
-                const input = document.createElement('input');
-                input.type = p.type;
-                input.value = opt.params[p.name];
-                input.addEventListener('input', e => {
-                    opt.params[p.name] = p.type === 'number' ? parseFloat(e.target.value) : e.target.value;
-                });
-                g.appendChild(input);
-                paramsPanel.appendChild(g);
-            });
-
-            div.appendChild(paramsPanel);
-            this.schedulerContainer.appendChild(div);
+            container.appendChild(div);
         });
     }
 
+    renderAll() {
+        this.renderItems('optimizerContainer', this.optimizers, AVAILABLE_OPTIMIZERS);
+        this.renderItems('schedulerContainer', this.schedulers, AVAILABLE_SCHEDULERS);
+        this.renderTransforms();
+    }
 
     populateModels() {
-        const t = this.taskType.value || 'classification'; 
-        this.modelSelect.innerHTML = ''; 
-
+        const t = this.elements.taskType.value || 'classification';
+        this.elements.modelSelect.innerHTML = '';
         const models = AVAILABLE_MODELS[t];
         Object.entries(models).forEach(([key, cfg]) => {
             const option = document.createElement('option');
-            option.value = key;        
-            option.textContent = cfg.label; 
-            this.modelSelect.appendChild(option);
+            option.value = key;
+            option.textContent = cfg.label;
+            this.elements.modelSelect.appendChild(option);
         });
     }
 
     setMode(mode) {
         this.currentMode = mode;
-        this.expandedId = null; 
-        this.trainBtn.classList.toggle("active", mode === "train");
-        this.valBtn.classList.toggle("active", mode === "val");
-        this.populateTransforms(); 
+        this.expandedId = null;
+        this.elements.trainBtn.classList.toggle("active", mode === "train");
+        this.elements.valBtn.classList.toggle("active", mode === "val");
         this.renderTransforms();
     }
 
     populateTransforms() {
-        this.transformSelect.innerHTML = '<option value="">Select a transform...</option>';
-
+        this.elements.transformSelect.innerHTML = '<option value="">Select a transform...</option>';
         Object.keys(AVAILABLE_TRANSFORMS).forEach(t => {
             const option = document.createElement("option");
             option.value = t;
             option.textContent = AVAILABLE_TRANSFORMS[t].label;
-            this.transformSelect.appendChild(option);
+            this.elements.transformSelect.appendChild(option);
         });
     }
 
     getCurrentTransforms() {
-        return this.currentMode === "train" ? this.trainTransforms : this.valTransforms;
+        return this.currentMode === 'train' ? this.transformsData.train : this.transformsData.val;
     }
 
     setCurrentTransforms(transforms) {
-        if (this.currentMode === "train") this.trainTransforms = transforms;
-        else this.valTransforms = transforms;
+        if (this.currentMode === 'train') this.transformsData.train = transforms;
+        else this.transformsData.val = transforms;
     }
 
-
     addTransform() {
-        const value = this.transformSelect.value;
-        if (!value) return;
+        const val = this.elements.transformSelect.value;
+        if (!val) return;
 
-        const cfg = AVAILABLE_TRANSFORMS[value];
-        const params = {};
-        cfg.params.forEach(p => (params[p.name] = p.default));
-
-        const newTransform = {
-            id: Date.now(),
-            name: value,
-            params
-        };
+        const cfg = AVAILABLE_TRANSFORMS[val];
+        const newTransform = { id: Date.now(), name: val, params: {} };
+        cfg.params.forEach(p => newTransform.params[p.name] = p.default);
 
         const current = this.getCurrentTransforms();
         current.push(newTransform);
         this.setCurrentTransforms(current);
 
-        this.transformSelect.value = "";
+        this.elements.transformSelect.value = '';
         this.renderTransforms();
     }
 
     removeTransform(id) {
-        let current = this.getCurrentTransforms();
-        current = current.filter(t => t.id !== id);
+        let current = this.getCurrentTransforms().filter(t => t.id !== id);
         this.setCurrentTransforms(current);
         if (this.expandedId === id) this.expandedId = null;
         this.renderTransforms();
     }
-
 
     toggleParamPanel(id) {
         this.expandedId = this.expandedId === id ? null : id;
         this.renderTransforms();
     }
 
-    updateParam(id, paramName, value) {
+    updateParam(id, name, value) {
         const current = this.getCurrentTransforms();
         const t = current.find(t => t.id === id);
-        if (t) t.params[paramName] = value;
+        if (t) t.params[name] = value;
         this.setCurrentTransforms(current);
         this.renderTransforms(false);
     }
 
     renderTransforms(refresh = true) {
-        if (refresh) this.transformContainer.innerHTML = "";
-
+        if (refresh) this.elements.transformContainer.innerHTML = '';
         const transforms = this.getCurrentTransforms();
-        if (transforms.length === 0) {
-            this.transformContainer.innerHTML = '<p style="color:#9ca3af;font-size:12px;text-align:center;">No transforms added.</p>';
-            this.preview.textContent = '';
+        if (!transforms.length) {
+            this.elements.transformContainer.innerHTML = '<p style="color:#9ca3af;font-size:12px;text-align:center;">No transforms added.</p>';
+            this.elements.transformPreview.textContent = '';
             return;
         }
 
         transforms.forEach(t => {
             const cfg = AVAILABLE_TRANSFORMS[t.name];
-            const div = document.createElement("div");
-            div.className = "transform-item";
+            const div = document.createElement('div');
+            div.className = 'transform-item';
 
-            const header = document.createElement("div");
-            header.className = "transform-header";
+            const header = document.createElement('div');
+            header.className = 'transform-header';
             header.innerHTML = `
                 <span>${cfg.label}</span>
                 <div class="transform-buttons">
@@ -382,59 +276,56 @@ export class TrainingOptions {
                     <button class="btn-delete" title="Remove">✖</button>
                 </div>
             `;
-            header.querySelector(".btn-delete").addEventListener("click", () => this.removeTransform(t.id));
-            header.querySelector(".btn-settings").addEventListener("click", () => this.toggleParamPanel(t.id));
+            header.querySelector('.btn-delete').addEventListener('click', () => this.removeTransform(t.id));
+            header.querySelector('.btn-settings').addEventListener('click', () => this.toggleParamPanel(t.id));
             div.appendChild(header);
 
             if (this.expandedId === t.id) {
                 cfg.params.forEach(p => {
-                    const g = document.createElement("div");
-                    g.className = "param-group";
+                    const g = document.createElement('div');
+                    g.className = 'param-group';
                     g.innerHTML = `<label>${p.name}</label>`;
 
-                    if (p.type === "select") {
-                        const s = document.createElement("select");
+                    if (p.type === 'select') {
+                        const s = document.createElement('select');
                         p.options.forEach(opt => {
-                            const o = document.createElement("option");
+                            const o = document.createElement('option');
                             o.value = opt;
                             o.textContent = opt;
                             if (t.params[p.name] === opt) o.selected = true;
                             s.appendChild(o);
                         });
-                        s.addEventListener("change", e => this.updateParam(t.id, p.name, e.target.value));
+                        s.addEventListener('change', e => this.updateParam(t.id, p.name, e.target.value));
                         g.appendChild(s);
                     } else {
-                        const i = document.createElement("input");
-                        i.type = p.type === "number" ? "number" : "text";
+                        const i = document.createElement('input');
+                        i.type = p.type === 'number' ? 'number' : 'text';
                         i.value = t.params[p.name];
-                        i.addEventListener("input", e =>
-                        this.updateParam(t.id, p.name, p.type === "number" ? parseFloat(e.target.value) : e.target.value)
-                        );
+                        i.addEventListener('input', e => this.updateParam(t.id, p.name, p.type === 'number' ? parseFloat(e.target.value) : e.target.value));
                         g.appendChild(i);
                     }
                     div.appendChild(g);
                 });
             }
-
-            this.transformContainer.appendChild(div);
+            this.elements.transformContainer.appendChild(div);
         });
 
-        this.preview.textContent = JSON.stringify(transforms, null, 2);
+        this.elements.transformPreview.textContent = JSON.stringify(transforms, null, 2);
     }
 
     getCurrentOptions() {
         return {
-            model: document.getElementById('modelSelect')?.value || 'Unknown',
-            task: document.getElementById('taskType')?.value || 'Classification',
-            dataset: document.getElementById('datasetSelect')?.value || '',
-            optimizer: document.getElementById('optimizerSelect')?.value || '',
-            scheduler: document.getElementById('schedulerSelect')?.value || '',
-            loss: document.getElementById('lossSelect')?.value || '',
-            epochs: Number(document.getElementById('epochs')?.value) || 5,
-            batchSize: Number(document.getElementById('batchSize')?.value) || 32,
-            learningRate: Number(document.getElementById('learningRate')?.value) || 0.001,
-            pretrained: document.getElementById('pretrained')?.checked || false,
-            params: '21.1M',
+            model: this.elements.modelSelect?.value || 'Unknown',
+            task: this.elements.taskType?.value || 'Classification',
+            dataset: this.elements.datasetSelect?.value || '',
+            optimizer: this.optimizers[0]?.name || '',
+            scheduler: this.schedulers[0]?.name || '',
+            loss: this.elements.lossSelect?.value || '',
+            epochs: Number(this.elements.epochs?.value) || 5,
+            batchSize: Number(this.elements.batchSize?.value) || 32,
+            learningRate: Number(this.elements.learningRate?.value) || 0.001,
+            pretrained: this.elements.pretrained?.checked || false,
+            params: '21.1M'
         };
     }
 }
