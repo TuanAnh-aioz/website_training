@@ -161,11 +161,11 @@ export class TrainingResults {
     downloadModel() {
         const epochInput = document.getElementById('epochs');
         const model = {
-            name: 'vgg16-demo',
-            task: 'classification',
+            name: this.tagModel.textContent,
+            task: this.tagTask.textContent,
             epochs: epochInput ? (isNaN(parseInt(epochInput.value,10)) ? 5 : parseInt(epochInput.value,10)) : 5,
             accuracy: document.getElementById('acc').textContent,
-            params: '2.4M'
+            params: this.tagParams.textContent
         };
         
         const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(model, null, 2));
