@@ -94,14 +94,13 @@ body {
 }
 
 .primary {
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  background:#1779ff;
-  border:none;
-  color:white;
-  font-weight:600;
-  cursor:pointer
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #bfe6ff;
+    cursor: pointer;
 }
 
 .main {
