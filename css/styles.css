@@ -143,32 +143,43 @@ body{
 }
 
 .transform-item {
-  background: #2d3748;
-  border: 1px solid #4b5563;
-  border-radius: 6px;
-  padding: 8px;
-  margin-bottom: 8px;
+    background-color: #374151; 
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column; 
 }
 
 .transform-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
 }
 
 .transform-header span {
-  color: white;
-  font-size: 13px;
-  flex: 1;
-  margin-left: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+}
+.transform-buttons {
+    display: flex;
+    gap: 0.25rem;
 }
 
-.transform-header button {
-  background: none;
-  border: none;
-  color: #f87171;
-  cursor: pointer;
+.transform-buttons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
 }
+.transform-buttons .btn-settings:hover { color: #3b82f6; }
+.transform-buttons .btn-delete:hover { color: #ef4444; }
+
 
 .param-group {
   margin-top: 6px;
@@ -206,13 +217,12 @@ body{
 }
 
 .transform-add button {
-  background: #2563eb;
+  background: #4b5563;
   border: none;
   color: white;
   cursor: pointer;
 }
 
-/* Button cho chế độ Train/Val */
 .btn-mode {
   padding: 6px 12px;
   border-radius: 6px;
@@ -227,7 +237,6 @@ body{
   background: #2563eb;
 }
 
-/* Container chứa các transform */
 .transform-container {
   margin-top: 10px;
   max-height: 200px;
@@ -237,7 +246,6 @@ body{
   padding: 10px;
 }
 
-/* Select thêm transform mới */
 .transform-select {
   padding: 8px;
   border-radius: 6px;
@@ -246,7 +254,6 @@ body{
   color: white;
 }
 
-/* Button thêm transform mới */
 .btn-add {
   padding: 8px 12px;
   background-color: #3182ce;
@@ -255,7 +262,6 @@ body{
   cursor: pointer;
 }
 
-/* Preview JSON */
 .transform-preview {
   margin-top: 10px;
   padding: 10px;
@@ -294,3 +300,98 @@ body{
   height: 16px;
   pointer-events: none;
 }
+
+.optimizer-container {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background-color: #2d3748; 
+    border-radius: 0.5rem;
+}
+
+.no-optimizer {
+    color: #9ca3af;
+    font-size: 12px;
+    text-align: center;
+}
+
+.optimizer-item {
+    background-color: #374151;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column; 
+}
+
+.optimizer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap; 
+}
+
+.optimizer-header span {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.params-panel {
+    margin-top: 0.5rem;
+    display: none; 
+}
+
+.optimizer-buttons {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.optimizer-buttons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+.optimizer-buttons .btn-settings:hover { color: #3b82f6; }
+.optimizer-buttons .btn-delete:hover { color: #ef4444; }
+
+.optimizer-add {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+.optimizer-add select {
+    flex: 1;
+    padding: 6px 6px;
+    font-size: 12px;
+    background-color: #374151;
+    color: #fff;
+    border: 1px solid #4b5563;
+    border-radius: 0.25rem;
+}
+.optimizer-add .btn-add {
+    background-color: #4b5563;
+    color: #fff;
+    font-size: 12px;
+    border: none;
+    cursor: pointer;
+}
+.optimizer-add .btn-add:hover {
+    background-color: #2563eb;
+}
+
+.optimizer-select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #4a5568;
+  background: #1a202c;
+  color: white;
+  }
+
+  

@@ -1,6 +1,7 @@
 // Training options module
 import { AVAILABLE_TRANSFORMS } from "./param/transforms.js";
 import { AVAILABLE_MODELS } from "./param/models.js";
+import { AVAILABLE_OPTIMIZERS } from "./param/optimizers.js";
 
 export class TrainingOptions {
     constructor() {
@@ -17,7 +18,6 @@ export class TrainingOptions {
         const initInterval = setInterval(() => {
             this.taskType = document.getElementById('taskType');
             this.modelSelect = document.getElementById('modelSelect');
-            this.optimizerSelect = document.getElementById('optimizerSelect');
             this.schedulerSelect = document.getElementById('schedulerSelect');
             this.lossSelect = document.getElementById('lossSelect');
             this.datasetSelect = document.getElementById('datasetSelect');
@@ -53,7 +53,113 @@ export class TrainingOptions {
                 this.renderTransforms();
             }
 
+            this.optimizerSelect = document.getElementById('optimizerSelect');
+            this.addOptimizerBtn = document.getElementById('addOptimizer');
+            this.optimizerContainer = document.getElementById('optimizerContainer');
+            this.optimizers = [];
+            
+            Object.keys(AVAILABLE_OPTIMIZERS).forEach(key => {
+                const opt = AVAILABLE_OPTIMIZERS[key];
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = opt.label;
+                this.optimizerSelect.appendChild(option);
+            });
+
+            // Add button
+            this.addOptimizerBtn.addEventListener('click', () => {
+                const optName = this.optimizerSelect.value;
+                if (!optName) return;
+
+                const newId = Date.now().toString();
+                const params = {};
+                AVAILABLE_OPTIMIZERS[optName].params.forEach(p => params[p.name] = p.default);
+
+                this.optimizers = [  
+                    {
+                        id: newId,
+                        name: optName,
+                        params
+                    }
+                ];
+
+                this.renderOptimizers();
+            });
+            this.renderOptimizers();
+
         }, 100);
+    }
+
+    renderOptimizers() {
+        this.optimizerContainer.innerHTML = '';
+
+        if (this.optimizers.length === 0) {
+            const p = document.createElement('p');
+            p.className = 'no-optimizer';
+            p.textContent = 'No optimizers added.';
+            this.optimizerContainer.appendChild(p);
+            return;
+        }
+
+        this.optimizers.forEach(opt => {
+            const div = document.createElement('div');
+            div.className = 'optimizer-item';
+
+            // Header
+            const header = document.createElement('div');
+            header.className = 'optimizer-header';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = AVAILABLE_OPTIMIZERS[opt.name].label;
+
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'optimizer-buttons';
+
+            const btnSettings = document.createElement('button');
+            btnSettings.className = 'btn-settings';
+            btnSettings.textContent = '⚙';
+            btnSettings.title = 'Settings';
+            btnSettings.addEventListener('click', () => {
+                paramsPanel.style.display = paramsPanel.style.display === 'none' ? 'block' : 'none';
+            });
+
+            const btnDelete = document.createElement('button');
+            btnDelete.className = 'btn-delete';
+            btnDelete.textContent = '✖';
+            btnDelete.title = 'Remove';
+            btnDelete.addEventListener('click', () => {
+                this.optimizers = this.optimizers.filter(o => o.id !== opt.id);
+                this.renderOptimizers();
+            });
+
+            btnContainer.appendChild(btnSettings);
+            btnContainer.appendChild(btnDelete);
+
+            header.appendChild(nameSpan);
+            header.appendChild(btnContainer);
+
+            div.appendChild(header);
+
+            // Params panel
+            const paramsPanel = document.createElement('div');
+            paramsPanel.className = 'params-panel';
+            AVAILABLE_OPTIMIZERS[opt.name].params.forEach(p => {
+                const g = document.createElement('div');
+                g.className = 'param-group';
+                g.innerHTML = `<label>${p.label}</label>`;
+                const input = document.createElement('input');
+                input.type = p.type;
+                input.value = opt.params[p.name];
+                input.addEventListener('input', e => {
+                    opt.params[p.name] = p.type === 'number' ? parseFloat(e.target.value) : e.target.value;
+                });
+                g.appendChild(input);
+                paramsPanel.appendChild(g);
+            });
+
+            div.appendChild(paramsPanel);
+            this.optimizerContainer.appendChild(div);
+        });
     }
 
     populateModels() {
@@ -162,12 +268,10 @@ export class TrainingOptions {
             header.className = "transform-header";
             header.innerHTML = `
                 <span>${cfg.label}</span>
-                <button class="btn-settings" title="Settings">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14,12.936a7.992,7.992,0,0,0,0-1.872l2.036-1.577a.5.5,0,0,0,.122-.654l-1.928-3.338a.5.5,0,0,0-.607-.222l-2.4.967a8.063,8.063,0,0,0-1.62-.936l-.36-2.553A.5.5,0,0,0,14.9,2H9.1a.5.5,0,0,0-.495.427l-.36,2.553a8.063,8.063,0,0,0-1.62.936l-2.4-.967a.5.5,0,0,0-.607.222L2.19,8.833a.5.5,0,0,0,.122.654L4.348,11.064a7.992,7.992,0,0,0,0,1.872L2.312,14.513a.5.5,0,0,0-.122.654l1.928,3.338a.5.5,0,0,0,.607.222l2.4-.967a8.063,8.063,0,0,0,1.62.936l.36,2.553A.5.5,0,0,0,9.1,22h5.8a.5.5,0,0,0,.495-.427l.36-2.553a8.063,8.063,0,0,0,1.62-.936l2.4.967a.5.5,0,0,0,.607-.222l1.928-3.338a.5.5,0,0,0-.122-.654ZM12,15.5A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>
-                </button>
-                <button class="btn-delete" title="Remove">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M9 3v1H4v2h16V4h-5V3H9zm-3 6v12a1 1 0 001 1h10a1 1 0 001-1V9H6z"/></svg>
-                </button>
+                <div class="transform-buttons">
+                    <button class="btn-settings" title="Settings">⚙</button>
+                    <button class="btn-delete" title="Remove">✖</button>
+                </div>
             `;
             header.querySelector(".btn-delete").addEventListener("click", () => this.removeTransform(t.id));
             header.querySelector(".btn-settings").addEventListener("click", () => this.toggleParamPanel(t.id));
@@ -221,7 +325,7 @@ export class TrainingOptions {
             batchSize: Number(document.getElementById('batchSize')?.value) || 32,
             learningRate: Number(document.getElementById('learningRate')?.value) || 0.001,
             pretrained: document.getElementById('pretrained')?.checked || false,
-            params: '21.1M', // ví dụ cho model VGG16
+            params: '21.1M',
         };
     }
 }

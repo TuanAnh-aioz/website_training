@@ -30,7 +30,7 @@
 
     <div class="transform-add mt-4 flex gap-2">
       <select id="transformSelect" class="transform-select">
-        <option value="">Select a transform...</option>
+        <option value="">Select a transform ...</option>
       </select>
       <button id="addTransform" type="button" class="btn-add">+</button>
     </div>
@@ -44,13 +44,18 @@
   </div>
 
   <div class="form-group">
-    <label for="optimizerSelect">Optimizer</label>
-    <select id="optimizerSelect">
-      <option>SGD</option>
-      <option selected>Adam</option>
-      <option>AdamW</option>
-      <option>RMSprop</option>
-    </select>
+      <label for="optimizerSelect">Optimizer</label>
+
+      <div id="optimizerContainer" class="optimizer-container">
+          <p class="no-optimizer">No optimizers added.</p>
+      </div>
+
+      <div class="optimizer-add flex gap-2 mt-2">
+          <select id="optimizerSelect" class="optimizer-select">
+            <option value="">Select an optimizer ...</option>
+          </select>
+          <button id="addOptimizer" type="button" class="btn-add">+</button>
+      </div>
   </div>
 
   <div class="form-group">
