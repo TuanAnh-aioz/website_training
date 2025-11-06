@@ -2,6 +2,7 @@
 import { AVAILABLE_TRANSFORMS } from "./param/transforms.js";
 import { AVAILABLE_MODELS } from "./param/models.js";
 import { AVAILABLE_OPTIMIZERS } from "./param/optimizers.js";
+import { AVAILABLE_SCHEDULERS } from "./param/schedulers.js";
 
 export class TrainingOptions {
     constructor() {
@@ -87,6 +88,41 @@ export class TrainingOptions {
             });
             this.renderOptimizers();
 
+            this.schedulerSelect = document.getElementById('schedulerSelect');
+            this.addSchedulerBtn = document.getElementById('addScheduler');
+            this.schedulerContainer = document.getElementById('schedulerContainer');
+            this.schedulers = [];
+            
+            Object.keys(AVAILABLE_SCHEDULERS).forEach(key => {
+                const opt = AVAILABLE_SCHEDULERS[key];
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = opt.label;
+                this.schedulerSelect.appendChild(option);
+            });
+
+            // Add button
+            this.addSchedulerBtn.addEventListener('click', () => {
+                const slName = this.schedulerSelect.value;
+                if (!slName) return;
+
+                const newId = Date.now().toString();
+                const params = {};
+                AVAILABLE_SCHEDULERS[slName].params.forEach(p => params[p.name] = p.default);
+
+                this.schedulers = [  
+                    {
+                        id: newId,
+                        name: slName,
+                        params
+                    }
+                ];
+
+                this.renderSchedulers();
+            });
+            this.renderSchedulers();
+
+
         }, 100);
     }
 
@@ -161,6 +197,79 @@ export class TrainingOptions {
             this.optimizerContainer.appendChild(div);
         });
     }
+
+    renderSchedulers() {
+        this.schedulerContainer.innerHTML = '';
+
+        if (this.schedulers.length === 0) {
+            const p = document.createElement('p');
+            p.className = 'no-scheduler';
+            p.textContent = 'No schedulers added.';
+            this.schedulerContainer.appendChild(p);
+            return;
+        }
+
+        this.schedulers.forEach(opt => {
+            const div = document.createElement('div');
+            div.className = 'scheduler-item';
+
+            // Header
+            const header = document.createElement('div');
+            header.className = 'scheduler-header';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = AVAILABLE_SCHEDULERS[opt.name].label;
+
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'scheduler-buttons';
+
+            const btnSettings = document.createElement('button');
+            btnSettings.className = 'btn-settings';
+            btnSettings.textContent = '⚙';
+            btnSettings.title = 'Settings';
+            btnSettings.addEventListener('click', () => {
+                paramsPanel.style.display = paramsPanel.style.display === 'none' ? 'block' : 'none';
+            });
+
+            const btnDelete = document.createElement('button');
+            btnDelete.className = 'btn-delete';
+            btnDelete.textContent = '✖';
+            btnDelete.title = 'Remove';
+            btnDelete.addEventListener('click', () => {
+                this.schedulers = this.schedulers.filter(o => o.id !== opt.id);
+                this.renderSchedulers();
+            });
+
+            btnContainer.appendChild(btnSettings);
+            btnContainer.appendChild(btnDelete);
+
+            header.appendChild(nameSpan);
+            header.appendChild(btnContainer);
+
+            div.appendChild(header);
+
+            // Params panel
+            const paramsPanel = document.createElement('div');
+            paramsPanel.className = 'params-panel';
+            AVAILABLE_SCHEDULERS[opt.name].params.forEach(p => {
+                const g = document.createElement('div');
+                g.className = 'param-group';
+                g.innerHTML = `<label>${p.label}</label>`;
+                const input = document.createElement('input');
+                input.type = p.type;
+                input.value = opt.params[p.name];
+                input.addEventListener('input', e => {
+                    opt.params[p.name] = p.type === 'number' ? parseFloat(e.target.value) : e.target.value;
+                });
+                g.appendChild(input);
+                paramsPanel.appendChild(g);
+            });
+
+            div.appendChild(paramsPanel);
+            this.schedulerContainer.appendChild(div);
+        });
+    }
+
 
     populateModels() {
         const t = this.taskType.value || 'classification'; 

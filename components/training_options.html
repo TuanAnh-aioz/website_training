@@ -47,7 +47,7 @@
       <label for="optimizerSelect">Optimizer</label>
 
       <div id="optimizerContainer" class="optimizer-container">
-          <p class="no-optimizer">No optimizers added.</p>
+          <p class="no-optimizer">No optimizer added.</p>
       </div>
 
       <div class="optimizer-add flex gap-2 mt-2">
@@ -59,13 +59,18 @@
   </div>
 
   <div class="form-group">
-    <label for="schedulerSelect">Scheduler</label>
-    <select id="schedulerSelect">
-      <option>StepLR</option>
-      <option selected>CosineAnnealingLR</option>
-      <option>ReduceLROnPlateau</option>
-      <option>ExponentialLR</option>
-    </select>
+      <label for="schedulerSelect">Scheduler</label>
+
+      <div id="schedulerContainer" class="scheduler-container">
+          <p class="no-scheduler">No scheduler added.</p>
+      </div>
+
+      <div class="scheduler-add flex gap-2 mt-2">
+          <select id="schedulerSelect" class="scheduler-select">
+            <option value="">Select an scheduler ...</option>
+          </select>
+          <button id="addScheduler" type="button" class="btn-add">+</button>
+      </div>
   </div>
 
   <div class="form-group">
