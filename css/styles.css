@@ -142,16 +142,6 @@ body{
   .metrics{grid-template-columns:1fr}
 }
 
-
-.transform-container {
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 8px;
-  padding: 8px;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
 .transform-item {
   background: #2d3748;
   border: 1px solid #4b5563;
@@ -207,8 +197,7 @@ body{
   margin-top: 8px;
 }
 
-.transform-add select,
-.transform-add button {
+.transform-add select {
   padding: 6px;
   border-radius: 6px;
   border: 1px solid #4b5563;
@@ -221,17 +210,6 @@ body{
   border: none;
   color: white;
   cursor: pointer;
-}
-
-.transform-preview {
-  background: #111827;
-  border-radius: 6px;
-  color: #9ca3af;
-  font-size: 11px;
-  padding: 6px;
-  margin-top: 8px;
-  max-height: 120px;
-  overflow-y: auto;
 }
 
 /* Button cho chế độ Train/Val */
