@@ -24,12 +24,33 @@ export class TrainingLogs {
     }
 
     log(text) {
+        if (!text) return;
+
         const li = document.createElement('li');
-        const t = new Date().toLocaleTimeString();
-        li.textContent = `${t} — ${text}`;
-        // append new logs so the newest appears at the bottom
+        const now = new Date().toLocaleTimeString();
+
+        const match = text.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}),\d+\s+(?:aioz_trainer\.[\w\.]+)\s+(\w+)\s+-\s+(.*)$/);
+
+        let logTime = now;
+        let level = "INFO";
+        let message = text;
+
+        if (match) {
+            logTime = match[1];
+            level = match[2];
+            message = match[3];
+        }
+
+        li.innerHTML = `
+            <span class="log-time">[${logTime}]</span>
+            <span class="log-level log-${level.toLowerCase()}">${level}</span>
+            <span class="log-text">${message}</span>
+        `;
+
         this.logList.appendChild(li);
+        this.logList.scrollTop = this.logList.scrollHeight;
     }
+
 
     getLogsText() {
         const items = Array.from(this.logList.querySelectorAll('li'));
