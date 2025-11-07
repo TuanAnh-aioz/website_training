@@ -193,7 +193,7 @@ body {
   background:var(--card);
   padding:12px;
   border-radius:12px;
-  max-height:68vh;
+  max-height:75vh;
   display:flex;
   flex-direction:column;
 }
