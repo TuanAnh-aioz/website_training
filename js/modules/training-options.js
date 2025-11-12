@@ -33,7 +33,6 @@ export class TrainingOptions {
             transformSelect: 'transformSelect',
             transformContainer: 'transformContainer',
             addTransformBtn: 'addTransform',
-            transformPreview: 'transformPreview',
             trainBtn: 'trainMode',
             valBtn: 'valMode',
             optimizerSelect: 'optimizerSelect',
@@ -473,7 +472,6 @@ export class TrainingOptions {
         const transforms = this.getCurrentTransforms();
         if (!transforms.length) {
             this.elements.transformContainer.innerHTML = '<p style="color:#9ca3af;font-size:12px;text-align:center;">No transforms added.</p>';
-            this.elements.transformPreview.textContent = '';
             return;
         }
 
@@ -525,7 +523,6 @@ export class TrainingOptions {
             this.elements.transformContainer.appendChild(div);
         });
 
-        this.elements.transformPreview.textContent = JSON.stringify(transforms, null, 2);
     }
 
     getCurrentOptions() {

@@ -118,17 +118,6 @@
   cursor: pointer;
 }
 
-.transform-preview {
-  margin-top: 10px;
-  padding: 10px;
-  background: #1a202c;
-  color: white;
-  font-size: 12px;
-  max-height: 200px;
-  overflow-y: auto;
-  border-radius: 8px;
-  font-family: "Courier New", Courier, monospace;
-}
 
 .btn-settings, .btn-delete {
   background: none;
