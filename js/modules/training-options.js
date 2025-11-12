@@ -232,11 +232,10 @@ export class TrainingOptions {
             const gpuList = document.createElement('div');
             gpuList.className = 'platform-gpu';
             gpuList.innerHTML = info.system.gpu_devices && info.system.gpu_devices.length
-            ? info.system.gpu_devices.map(g => `${g.name} (${(g.total/1e9).toFixed(1)} GB)`).join('<br>')
+            ? info.system.gpu_devices.map(g => `${g.name} :${(g.total/1e9).toFixed(1)} GB`).join('<br>')
             : 'None';
 
             gpuRow.appendChild(gpuList);
-
 
             details.appendChild(cpuRow);
             details.appendChild(ramRow);
@@ -532,7 +531,7 @@ export class TrainingOptions {
     }
 
     getCurrentOptions() {
-        console.log("this option:", this)
+        console.log("this options:", this)
         const result = {
             model: this.elements.modelSelect?.value,
             task: this.elements.taskType?.value,
@@ -549,7 +548,7 @@ export class TrainingOptions {
             learningRate: Number(this.elements.learningRate?.value),
             pretrained: this.elements.pretrained?.checked,
             params: '21.1M',
-            platform: this.elements.platformSelect?.value || null,
+            platform: this.selectedPlatforms
         };
         return result
     }
@@ -600,6 +599,13 @@ export class TrainingOptions {
             },
         };
 
+        const platformObj = {};
+        options.platform.forEach(item => {
+            const os = item.info.system.os;
+            const nodeId = item.info.node_id;
+            platformObj[os] = nodeId;
+        });
+
         // ⚙️ Compose final JSON
         const config = {
             task: options.task || "classification",
@@ -611,7 +617,7 @@ export class TrainingOptions {
             loss,
             log_interval: 20,
             threshold: options.threshold || 0,
-            platform: options.platform || "linux",
+            platform: platformObj
         };
 
         return config;
