@@ -87,13 +87,7 @@ export class TrainingOptions {
                     'Content-Type': 'application/json',
                     'api-token': this.apiToken
                 },
-                body: JSON.stringify({
-                    cpu_cores: 0,
-                    system_ram: 0,
-                    gpu: true,
-                    gpu_memory: 0,
-                    gpu_device: 1
-                })
+                body: ""
             });
 
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -542,13 +536,20 @@ export class TrainingOptions {
 
     buildTrainingConfig(options) {
         // ⚙️ Build model section
+        let pretrained_item = ""; 
+        if (!!options.pretrained) {
+            pretrained_item = "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/classification/pretrained/resnet18-f37072fd.pth";
+        }
         const model = {
             name: options.model,
-            pretrained: !!options.pretrained,
+            pretrained: pretrained_item,
+            resume: "", 
+            num_classes: 2
         };
 
         // ⚙️ Build dataset section
         const dataset = {
+            csv_file: "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/classification/metadata.csv",
             name: options.dataset,
             batch_size: Number(options.batchSize) || 4,
             num_workers: options.numberWroker,
