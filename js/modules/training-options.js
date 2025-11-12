@@ -214,26 +214,35 @@ export class TrainingOptions {
             details.id = `platform-details-${key}`;
 
             // populate details: split into small items
-            const cpu = document.createElement('li');
-            const ram = document.createElement('li');
-            const arch = document.createElement('li');
-            const gpus = document.createElement('li');
+            const cpuRow = document.createElement('div');
+            cpuRow.className = 'platform-info-row';
+            cpuRow.innerHTML = `<span>CPU cores:</span><span>${info.system.cpu_cores}</span>`;
 
-            cpu.textContent = `CPU cores: ${info.system.cpu_cores}`;
-            ram.textContent = `RAM: ${(info.system.system_ram / 1e9).toFixed(1)} GB`;
-            arch.textContent = `Arch: ${info.system.architecture}`;
-            gpus.innerHTML = `GPU(s): ${info.system.gpu_devices && info.system.gpu_devices.length ? info.system.gpu_devices.map(g => `${g.name} (${(g.total/1e9).toFixed(1)} GB)`).join(', ') : 'None'}`;
+            const ramRow = document.createElement('div');
+            ramRow.className = 'platform-info-row';
+            ramRow.innerHTML = `<span>RAM:</span><span>${(info.system.system_ram / 1e9).toFixed(1)} GB</span>`;
 
-            const list = document.createElement('ul');
-            list.className = 'platform-info-list';
-            list.appendChild(cpu);
-            list.appendChild(ram);
-            list.appendChild(arch);
-            list.appendChild(gpus);
+            const archRow = document.createElement('div');
+            archRow.className = 'platform-info-row';
+            archRow.innerHTML = `<span>Arch:</span><span>${info.system.architecture}</span>`;
 
-            details.appendChild(list);
+            const gpuRow = document.createElement('div');
+            gpuRow.className = 'platform-info-row';
+            gpuRow.innerHTML = `<span>GPU(s):</span>`;
+            const gpuList = document.createElement('div');
+            gpuList.className = 'platform-gpu';
+            gpuList.innerHTML = info.system.gpu_devices && info.system.gpu_devices.length
+            ? info.system.gpu_devices.map(g => `${g.name} (${(g.total/1e9).toFixed(1)} GB)`).join('<br>')
+            : 'None';
+
+            gpuRow.appendChild(gpuList);
+
+
+            details.appendChild(cpuRow);
+            details.appendChild(ramRow);
+            details.appendChild(archRow);
+            details.appendChild(gpuRow);
             item.appendChild(details);
-
             container.appendChild(item);
 
             // events
