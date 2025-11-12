@@ -1,0 +1,86 @@
+/* Platform uses same card style as transforms but with small tweaks */
+.platform-container {
+  margin-top: 10px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #2d3748;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+/* Each platform card (same visual as transform-item) */
+.platform-item {
+  background-color: #374151;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header: name left, buttons right, single line */
+.platform-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+/* left text block (OS and node id) */
+.platform-header .platform-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.platform-title .os { text-transform:uppercase; font-size:0.85rem; color:#e6eef8; }
+.platform-title .node { font-size:0.8rem; color:#9ca3af; }
+
+/* right button group */
+.platform-buttons {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+/* buttons style aligned with transform buttons */
+.platform-buttons button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: all .15s ease;
+}
+.platform-buttons .btn-settings:hover { color: #3b82f6; background: rgba(59,130,246,0.08); }
+.platform-buttons .btn-remove:hover { color: #ef4444; background: rgba(239,68,68,0.08); }
+
+/* details panel (collapsed by default) */
+.platform-details {
+  margin-top: 8px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 13px;
+  color: #dbeafe;
+  display: none; /* toggle to block when expanded */
+}
+
+/* visible when expanded */
+.platform-details.show { display: block; }
+
+/* small list inside details */
+.platform-info-list { list-style:none; padding:0; margin:0; display:flex; gap:8px; flex-wrap:wrap; }
+.platform-info-list li { min-width: 140px; color:#cbd5e1; }
+
+/* Keep add/select line same width as transforms */
+.transform-add .transform-select { flex:1; }
+.transform-add .btn-add { width:44px; }
+
+/* preview monospace */
+#platformPreview { max-height:160px; overflow:auto; }

@@ -10,7 +10,8 @@ export class TrainingOptions {
         this.transformsData = { train: [], val: [] };
         this.optimizers = [];
         this.schedulers = [];
-        this.platformsData = {};  // <-- thêm
+        this.platformsData = {};  
+        this.selectedPlatforms = [];
         this.elements = {}; 
         this.initElements();
     }
@@ -40,8 +41,11 @@ export class TrainingOptions {
             optimizerContainer: 'optimizerContainer',
             schedulerSelect: 'schedulerSelect',
             addSchedulerBtn: 'addScheduler',
-            schedulerContainer: 'schedulerContainer'
+            schedulerContainer: 'schedulerContainer',
+            platformSelect: 'platformSelect',
+            platformContainer: 'platformContainer',
         };
+
 
         const initInterval = setInterval(() => {
             let allFound = true;
@@ -52,14 +56,13 @@ export class TrainingOptions {
             });
 
             if (!allFound) return;
-
             clearInterval(initInterval);
 
-            // Event listeners
             this.elements.taskType.addEventListener('change', () => this.populateModels());
             this.elements.trainBtn.addEventListener('click', () => this.setMode("train"));
             this.elements.valBtn.addEventListener('click', () => this.setMode("val"));
             this.elements.addTransformBtn.addEventListener('click', () => this.addTransform());
+            
             this.populateModels();
             this.populateTransforms();
             this.populateDropdown(this.elements.optimizerSelect, AVAILABLE_OPTIMIZERS);
@@ -67,14 +70,8 @@ export class TrainingOptions {
 
             this.elements.addOptimizerBtn.addEventListener('click', () => this.addSingleItem('optimizer'));
             this.elements.addSchedulerBtn.addEventListener('click', () => this.addSingleItem('scheduler'));
-            
-            this.elements.platformSelect = document.getElementById('platformSelect');
-            this.elements.platformInfo = document.getElementById('platform-info');
 
-            if (this.elements.platformSelect) {
-                this.elements.platformSelect.addEventListener('change', () => this.updatePlatformInfo());
-                this.fetchPlatforms(); 
-            }
+            this.fetchPlatforms();
 
             this.renderAll();
         }, 100);
@@ -82,40 +79,42 @@ export class TrainingOptions {
 
     async fetchPlatforms() {
         try {
-            // const res = await fetch('http://your-api-endpoint/platforms', {
-            //     headers: { 'accept': 'application/json', 'api-token': this.apiToken }
-            // });
-            // if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = {
-                linux: [
-                    { "node_id": "ABC", 
-                      "system": { 
-                        "os": "linux", 
-                        "cpu_cores": 8, 
-                        "system_ram": 67355385856, 
-                        "architecture": "x86_64", 
-                        "gpu_devices": [
-                            {"id": 0, 
-                            "name": "NVIDIA GeForce GTX 1080 Ti", 
-                            "total": 11811160064}], }
-                        }
-                    ],
-                window: [
-                    { "node_id": "DEF", 
-                      "system": { 
-                        "os": "window", 
-                        "cpu_cores": 2, 
-                        "system_ram": 33234206720, 
-                        "architecture": "AMD64", 
-                        "gpu_devices": [
-                            {"id": 0, 
-                            "name": "NVIDIA GeForce GTX 3080 Ti", 
-                            "total": 24811160064}], }
-                        }
-                ]
-            }
+            const res = await fetch('http://your-api-endpoint/platforms', {
+                headers: { 'accept': 'application/json', 'api-token': this.apiToken }
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            // const data = {
+            //     linux: [
+            //         { 
+            //             node_id: "ABC", 
+            //             system: { 
+            //                 os: "linux", 
+            //                 cpu_cores: 8, 
+            //                 system_ram: 67355385856, 
+            //                 architecture: "x86_64", 
+            //                 gpu_devices: [
+            //                     { id: 0, name: "NVIDIA GeForce GTX 1080 Ti", total: 11811160064 },
+            //                 ],
+            //             }
+            //         }
+            //     ],
+            //     windows: [
+            //         { 
+            //             node_id: "DEF", 
+            //             system: { 
+            //                 os: "windows", 
+            //                 cpu_cores: 2, 
+            //                 system_ram: 33234206720, 
+            //                 architecture: "AMD64", 
+            //                 gpu_devices: [
+            //                     { id: 0, name: "NVIDIA GeForce GTX 3080 Ti", total: 24811160064 },
+            //                 ],
+            //             }
+            //         }
+            //     ]
+            // };
             
-            this.platformsData = data; // lưu data
+            this.platformsData = data; 
             this.populatePlatformDropdown(data);
         } catch (err) {
             console.error("Error fetching platforms:", err);
@@ -124,41 +123,135 @@ export class TrainingOptions {
         }
     }
 
-    populatePlatformDropdown(data) {
+    populatePlatformDropdown() {
         const select = this.elements.platformSelect;
-        select.innerHTML = '<option value="" disabled selected>Select a platform...</option>';
+        if (!select) return;
 
-        Object.entries(data).forEach(([os, nodes]) => {
-            nodes.forEach(node => {
-                const opt = document.createElement('option');
-                opt.value = `${os}_${node.node_id}`; // ví dụ "linux_ABC"
-                opt.textContent = `${os.toUpperCase()} - Node ${node.node_id}`;
-                select.appendChild(opt);
+        select.innerHTML = `<option value="">Select platform...</option>`;
+
+        Object.entries(this.platformsData).forEach(([os, nodes]) => {
+            nodes.forEach(n => {
+                const option = document.createElement('option');
+                option.value = `${os}_${n.node_id}`;
+                option.textContent = `${os.toUpperCase()} (${n.system.architecture})`;
+                select.appendChild(option);
             });
+        });
+
+        select.addEventListener('change', () => {
+            this.addSelectedPlatform(select.value);
+            select.value = '';
         });
     }
 
-    updatePlatformInfo() {
-        const val = this.elements.platformSelect.value;
-        if (!val) {
-            this.elements.platformInfo.textContent = '';
+    addSelectedPlatform(platformKey) {
+        if (!platformKey) return;
+
+        if (this.selectedPlatforms.some(p => p.key === platformKey)) return; // tránh trùng
+
+        const [os, node_id] = platformKey.split("_");
+        const platformInfo = this.platformsData[os]?.find(p => p.node_id === node_id);
+        if (!platformInfo) return;
+
+        this.selectedPlatforms.push({ key: platformKey, info: platformInfo });
+        this.renderPlatforms();
+    }
+
+    renderPlatforms() {
+        const container = this.elements.platformContainer || document.getElementById('platformContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (!this.selectedPlatforms || this.selectedPlatforms.length === 0) {
+            const p = document.createElement('p');
+            p.style.color = '#9ca3af';
+            p.style.fontSize = '12px';
+            p.style.textAlign = 'center';
+            p.textContent = 'No platform selected.';
+            container.appendChild(p);
+            this.elements.platformPreview && (this.elements.platformPreview.textContent = '');
             return;
         }
 
-        const [os, node_id] = val.split('_');
-        const node = this.platformsData[os].find(n => n.node_id === node_id);
-        if (!node) return;
+        this.selectedPlatforms.forEach(({ key, info }) => {
+            const item = document.createElement('div');
+            item.className = 'platform-item';
 
-        const sys = node.system;
-        let info = `OS: ${sys.os}\nCPU cores: ${sys.cpu_cores}\nRAM: ${(sys.system_ram/1e9).toFixed(2)} GB\nArchitecture: ${sys.architecture}`;
-        if (sys.gpu_devices && sys.gpu_devices.length) {
-            info += `\nGPU(s):\n`;
-            sys.gpu_devices.forEach(gpu => {
-                info += ` - ${gpu.name} (Total: ${(gpu.total/1e9).toFixed(2)} GB)\n`;
+            // build header
+            const header = document.createElement('div');
+            header.className = 'platform-header';
+
+            const title = document.createElement('div');
+            title.className = 'platform-title';
+            title.innerHTML = `<span class="os">${info.system.os}</span><span class="node">${info.node_id}</span>`;
+
+            const btns = document.createElement('div');
+            btns.className = 'platform-buttons';
+            const btnSettings = document.createElement('button');
+            btnSettings.className = 'btn-settings';
+            btnSettings.type = 'button';
+            btnSettings.dataset.key = key;
+            btnSettings.title = 'View info';
+            btnSettings.textContent = '⚙';
+
+            const btnRemove = document.createElement('button');
+            btnRemove.className = 'btn-remove';
+            btnRemove.type = 'button';
+            btnRemove.dataset.key = key;
+            btnRemove.title = 'Remove';
+            btnRemove.textContent = '✖';
+
+            btns.appendChild(btnSettings);
+            btns.appendChild(btnRemove);
+
+            header.appendChild(title);
+            header.appendChild(btns);
+            item.appendChild(header);
+
+            // details panel (hidden by default)
+            const details = document.createElement('div');
+            details.className = 'platform-details';
+            details.id = `platform-details-${key}`;
+
+            // populate details: split into small items
+            const cpu = document.createElement('li');
+            const ram = document.createElement('li');
+            const arch = document.createElement('li');
+            const gpus = document.createElement('li');
+
+            cpu.textContent = `CPU cores: ${info.system.cpu_cores}`;
+            ram.textContent = `RAM: ${(info.system.system_ram / 1e9).toFixed(1)} GB`;
+            arch.textContent = `Arch: ${info.system.architecture}`;
+            gpus.innerHTML = `GPU(s): ${info.system.gpu_devices && info.system.gpu_devices.length ? info.system.gpu_devices.map(g => `${g.name} (${(g.total/1e9).toFixed(1)} GB)`).join(', ') : 'None'}`;
+
+            const list = document.createElement('ul');
+            list.className = 'platform-info-list';
+            list.appendChild(cpu);
+            list.appendChild(ram);
+            list.appendChild(arch);
+            list.appendChild(gpus);
+
+            details.appendChild(list);
+            item.appendChild(details);
+
+            container.appendChild(item);
+
+            // events
+            btnSettings.addEventListener('click', () => {
+                details.classList.toggle('show');
             });
-        }
 
-        this.elements.platformInfo.textContent = info;
+            btnRemove.addEventListener('click', (e) => {
+                const k = e.currentTarget.dataset.key;
+                this.selectedPlatforms = this.selectedPlatforms.filter(p => p.key !== k);
+                this.renderPlatforms();
+            });
+        });
+
+        // update preview JSON (optional)
+        if (this.elements.platformPreview) {
+            this.elements.platformPreview.textContent = JSON.stringify(this.selectedPlatforms.map(p => ({ platform: p.info.system.os, node_id: p.info.node_id })), null, 2);
+        }
     }
 
     populateDropdown(selectEl, data) {

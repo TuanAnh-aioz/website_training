@@ -123,12 +123,17 @@
     </div>
   </div>
 
-  <div class="form-group" id="platform-group">
-    <label for="platformSelect">Platform</label>
-    <select id="platformSelect">
-      <option value="" disabled selected>Loading platforms...</option>
-    </select>
-    <div id="platform-info" class="platform-info"></div>
+  <div class="form-group">
+    <label for="platformSelect">Platforms</label>
+
+    <div id="platformContainer" class="transform-container platform-container"></div>
+
+    <div class="transform-add mt-4 flex gap-2">
+      <select id="platformSelect" class="transform-select">
+        <option value="">Select a platform ...</option>
+      </select>
+      <button id="addPlatform" type="button" class="btn-add">+</button>
+    </div>
   </div>
 
   <button id="startBtn" class="primary">Start Training</button>
