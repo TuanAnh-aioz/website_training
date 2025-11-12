@@ -163,12 +163,12 @@ export class TrainingOptions {
         container.innerHTML = '';
 
         if (!this.selectedPlatforms || this.selectedPlatforms.length === 0) {
-            const p = document.createElement('p');
-            p.style.color = '#9ca3af';
-            p.style.fontSize = '12px';
-            p.style.textAlign = 'center';
-            p.textContent = 'No platform selected.';
-            container.appendChild(p);
+                const p = document.createElement('p');
+                p.style.color = '#9ca3af';
+                p.style.fontSize = '12px';
+                p.style.textAlign = 'center';
+                p.textContent = 'No platform selected.';
+                container.appendChild(p);
             this.elements.platformPreview && (this.elements.platformPreview.textContent = '');
             return;
         }
@@ -183,7 +183,7 @@ export class TrainingOptions {
 
             const title = document.createElement('div');
             title.className = 'platform-title';
-            title.innerHTML = `<span class="os">${info.system.os}</span><span class="node">${info.node_id}</span>`;
+            title.innerHTML = `<span class="os">${info.system.os}</span>`;
 
             const btns = document.createElement('div');
             btns.className = 'platform-buttons';
@@ -247,7 +247,7 @@ export class TrainingOptions {
                 this.renderPlatforms();
             });
         });
-
+        
         // update preview JSON (optional)
         if (this.elements.platformPreview) {
             this.elements.platformPreview.textContent = JSON.stringify(this.selectedPlatforms.map(p => ({ platform: p.info.system.os, node_id: p.info.node_id })), null, 2);

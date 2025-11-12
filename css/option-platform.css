@@ -84,3 +84,10 @@
 
 /* preview monospace */
 #platformPreview { max-height:160px; overflow:auto; }
+
+
+.no-platform {
+    color: #9ca3af;
+    font-size: 12px;
+    text-align: center;
+}
