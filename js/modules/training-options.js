@@ -127,13 +127,11 @@ export class TrainingOptions {
         const select = this.elements.platformSelect;
         if (!select) return;
 
-        select.innerHTML = `<option value="">Select platform...</option>`;
-
         Object.entries(this.platformsData).forEach(([os, nodes]) => {
             nodes.forEach(n => {
                 const option = document.createElement('option');
                 option.value = `${os}_${n.node_id}`;
-                option.textContent = `${os.toUpperCase()} (${n.system.architecture})`;
+                option.textContent = `${os.toUpperCase()}`;
                 select.appendChild(option);
             });
         });
@@ -232,7 +230,7 @@ export class TrainingOptions {
             const gpuList = document.createElement('div');
             gpuList.className = 'platform-gpu';
             gpuList.innerHTML = info.system.gpu_devices && info.system.gpu_devices.length
-            ? info.system.gpu_devices.map(g => `${g.name} :${(g.total/1e9).toFixed(1)} GB`).join('<br>')
+            ? info.system.gpu_devices.map(g => `${g.name}`).join('<br>')
             : 'None';
 
             gpuRow.appendChild(gpuList);
