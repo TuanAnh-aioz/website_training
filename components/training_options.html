@@ -112,7 +112,7 @@
     </div>
   </div>
 
-    <div class="form-group two-col">
+  <div class="form-group two-col">
     <div>
       <label for="epochs">Epochs</label>
         <input id="epochs" type="number" min="1" value="0">
@@ -121,6 +121,14 @@
       <label for="pretrained">Pretrained</label>
       <input id="pretrained" type="checkbox" checked>
     </div>
+  </div>
+
+  <div class="form-group" id="platform-group">
+    <label for="platformSelect">Platform</label>
+    <select id="platformSelect">
+      <option value="" disabled selected>Loading platforms...</option>
+    </select>
+    <div id="platform-info" class="platform-info"></div>
   </div>
 
   <button id="startBtn" class="primary">Start Training</button>

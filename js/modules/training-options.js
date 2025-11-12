@@ -10,6 +10,7 @@ export class TrainingOptions {
         this.transformsData = { train: [], val: [] };
         this.optimizers = [];
         this.schedulers = [];
+        this.platformsData = {};  // <-- thêm
         this.elements = {}; 
         this.initElements();
     }
@@ -66,9 +67,98 @@ export class TrainingOptions {
 
             this.elements.addOptimizerBtn.addEventListener('click', () => this.addSingleItem('optimizer'));
             this.elements.addSchedulerBtn.addEventListener('click', () => this.addSingleItem('scheduler'));
+            
+            this.elements.platformSelect = document.getElementById('platformSelect');
+            this.elements.platformInfo = document.getElementById('platform-info');
+
+            if (this.elements.platformSelect) {
+                this.elements.platformSelect.addEventListener('change', () => this.updatePlatformInfo());
+                this.fetchPlatforms(); 
+            }
 
             this.renderAll();
         }, 100);
+    }
+
+    async fetchPlatforms() {
+        try {
+            // const res = await fetch('http://your-api-endpoint/platforms', {
+            //     headers: { 'accept': 'application/json', 'api-token': this.apiToken }
+            // });
+            // if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = {
+                linux: [
+                    { "node_id": "ABC", 
+                      "system": { 
+                        "os": "linux", 
+                        "cpu_cores": 8, 
+                        "system_ram": 67355385856, 
+                        "architecture": "x86_64", 
+                        "gpu_devices": [
+                            {"id": 0, 
+                            "name": "NVIDIA GeForce GTX 1080 Ti", 
+                            "total": 11811160064}], }
+                        }
+                    ],
+                window: [
+                    { "node_id": "DEF", 
+                      "system": { 
+                        "os": "window", 
+                        "cpu_cores": 2, 
+                        "system_ram": 33234206720, 
+                        "architecture": "AMD64", 
+                        "gpu_devices": [
+                            {"id": 0, 
+                            "name": "NVIDIA GeForce GTX 3080 Ti", 
+                            "total": 24811160064}], }
+                        }
+                ]
+            }
+            
+            this.platformsData = data; // lưu data
+            this.populatePlatformDropdown(data);
+        } catch (err) {
+            console.error("Error fetching platforms:", err);
+            const select = this.elements.platformSelect;
+            if (select) select.innerHTML = '<option value="" disabled>Error loading platforms</option>';
+        }
+    }
+
+    populatePlatformDropdown(data) {
+        const select = this.elements.platformSelect;
+        select.innerHTML = '<option value="" disabled selected>Select a platform...</option>';
+
+        Object.entries(data).forEach(([os, nodes]) => {
+            nodes.forEach(node => {
+                const opt = document.createElement('option');
+                opt.value = `${os}_${node.node_id}`; // ví dụ "linux_ABC"
+                opt.textContent = `${os.toUpperCase()} - Node ${node.node_id}`;
+                select.appendChild(opt);
+            });
+        });
+    }
+
+    updatePlatformInfo() {
+        const val = this.elements.platformSelect.value;
+        if (!val) {
+            this.elements.platformInfo.textContent = '';
+            return;
+        }
+
+        const [os, node_id] = val.split('_');
+        const node = this.platformsData[os].find(n => n.node_id === node_id);
+        if (!node) return;
+
+        const sys = node.system;
+        let info = `OS: ${sys.os}\nCPU cores: ${sys.cpu_cores}\nRAM: ${(sys.system_ram/1e9).toFixed(2)} GB\nArchitecture: ${sys.architecture}`;
+        if (sys.gpu_devices && sys.gpu_devices.length) {
+            info += `\nGPU(s):\n`;
+            sys.gpu_devices.forEach(gpu => {
+                info += ` - ${gpu.name} (Total: ${(gpu.total/1e9).toFixed(2)} GB)\n`;
+            });
+        }
+
+        this.elements.platformInfo.textContent = info;
     }
 
     populateDropdown(selectEl, data) {
@@ -356,7 +446,8 @@ export class TrainingOptions {
             batchSize: Number(this.elements.batchSize?.value),
             learningRate: Number(this.elements.learningRate?.value),
             pretrained: this.elements.pretrained?.checked,
-            params: '21.1M'
+            params: '21.1M',
+            platform: this.elements.platformSelect?.value || null,
         };
         return result
     }
@@ -418,6 +509,7 @@ export class TrainingOptions {
             loss,
             log_interval: 20,
             threshold: options.threshold || 0,
+            platform: options.platform || "linux",
         };
 
         return config;

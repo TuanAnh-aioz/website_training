@@ -48,23 +48,25 @@ class App {
         this.logs.log('Submitting training task to server...');
 
         try {
-            const res = await fetch('http://10.0.0.238:8083/training/task/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'accept': 'application/json',
-                    'api-token': this.apiToken
-                },
-                body: JSON.stringify(config)
-            });
+            // const res = await fetch('http://10.0.0.238:8083/training/task/create', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'accept': 'application/json',
+            //         'api-token': this.apiToken
+            //     },
+            //     body: JSON.stringify(config)
+            // });
 
-            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-            const data = res.data
+            // if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+            // const data = res.data
+            // this.logs.log(`data: ${data}`);
             this.logs.log(`Task config: ${JSON.stringify(config)}`);
-            // const data = {
-            //     success: true,
-            //     data: "task_id: 1b2fc81a-c914-469c-8891-cb278cefe32e"
-            // };
+            
+            const data = {
+                success: true,
+                data: "task_id: 1b2fc81a-c914-469c-8891-cb278cefe32e"
+            };
 
             if (data.success && data.data) {
                 this.taskId = data.data.split(':')[1].trim();
