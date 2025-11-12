@@ -70,7 +70,9 @@ export class TrainingOptions {
             this.elements.addOptimizerBtn.addEventListener('click', () => this.addSingleItem('optimizer'));
             this.elements.addSchedulerBtn.addEventListener('click', () => this.addSingleItem('scheduler'));
 
-            this.fetchPlatforms();
+            setInterval(() => {
+                this.fetchPlatforms();
+            }, 30000);
 
             this.renderAll();
         }, 100);
@@ -78,41 +80,28 @@ export class TrainingOptions {
 
     async fetchPlatforms() {
         try {
-            const res = await fetch('http://your-api-endpoint/platforms', {
-                headers: { 'accept': 'application/json', 'api-token': this.apiToken }
+            const res = await fetch('http://10.0.0.238:8083/training/nodes/available', {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'api-token': this.apiToken
+                },
+                body: JSON.stringify({
+                    cpu_cores: 0,
+                    system_ram: 0,
+                    gpu: true,
+                    gpu_memory: 0,
+                    gpu_device: 1
+                })
             });
+
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            // const data = {
-            //     linux: [
-            //         { 
-            //             node_id: "ABC", 
-            //             system: { 
-            //                 os: "linux", 
-            //                 cpu_cores: 8, 
-            //                 system_ram: 67355385856, 
-            //                 architecture: "x86_64", 
-            //                 gpu_devices: [
-            //                     { id: 0, name: "NVIDIA GeForce GTX 1080 Ti", total: 11811160064 },
-            //                 ],
-            //             }
-            //         }
-            //     ],
-            //     windows: [
-            //         { 
-            //             node_id: "DEF", 
-            //             system: { 
-            //                 os: "windows", 
-            //                 cpu_cores: 2, 
-            //                 system_ram: 33234206720, 
-            //                 architecture: "AMD64", 
-            //                 gpu_devices: [
-            //                     { id: 0, name: "NVIDIA GeForce GTX 3080 Ti", total: 24811160064 },
-            //                 ],
-            //             }
-            //         }
-            //     ]
-            // };
-            
+
+            const data_api = await res.json();
+            const data = data_api.data
+            console.log("Update platform support training !")
+
             this.platformsData = data; 
             this.populatePlatformDropdown(data);
         } catch (err) {
@@ -125,7 +114,7 @@ export class TrainingOptions {
     populatePlatformDropdown() {
         const select = this.elements.platformSelect;
         if (!select) return;
-
+        select.innerHTML = `<option value="">Select a platform ...</option>`;
         Object.entries(this.platformsData).forEach(([os, nodes]) => {
             nodes.forEach(n => {
                 const option = document.createElement('option');
@@ -135,10 +124,13 @@ export class TrainingOptions {
             });
         });
 
-        select.addEventListener('change', () => {
-            this.addSelectedPlatform(select.value);
-            select.value = '';
-        });
+        if (!this._platformListenerAttached) {
+            select.addEventListener('change', () => {
+                this.addSelectedPlatform(select.value);
+                select.value = '';
+            });
+            this._platformListenerAttached = true;
+        }
     }
 
     addSelectedPlatform(platformKey) {
@@ -225,7 +217,7 @@ export class TrainingOptions {
 
             const gpuRow = document.createElement('div');
             gpuRow.className = 'platform-info-row';
-            gpuRow.innerHTML = `<span>GPU(s):</span>`;
+            gpuRow.innerHTML = `<span>GPUs:</span>`;
             const gpuList = document.createElement('div');
             gpuList.className = 'platform-gpu';
             gpuList.innerHTML = info.system.gpu_devices && info.system.gpu_devices.length
