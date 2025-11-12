@@ -15,16 +15,24 @@ class App {
         this.taskId = null; 
         this.logOffset = 0;
         this.apiToken = 'zxzfvsddsa';
+        this.polling = false; 
 
         this.initializeControls();
-        
-        // Initial setup
         this.logs.log('UI ready');
     }
 
     initializeControls() {
         if(this.startBtn) {
-            this.startBtn.addEventListener('click', () => this.submitTask());
+            this.startBtn.addEventListener('click', () => this.toggleTraining());
+        }
+    }
+
+    async toggleTraining() {
+        if(this.startBtn.textContent === 'Start Training') {
+            this.startBtn.textContent = 'Stop Training';
+            await this.submitTask();
+        } else {
+            this.stopTraining();
         }
     }
 
@@ -51,33 +59,43 @@ class App {
             });
 
             if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-            const data = {
-                success: true,
-                data: "task_id: 1b2fc81a-c914-469c-8891-cb278cefe32e"
-            }
+            const data = res.data
+            this.logs.log(`Task config: ${JSON.stringify(config)}`);
+            // const data = {
+            //     success: true,
+            //     data: "task_id: 1b2fc81a-c914-469c-8891-cb278cefe32e"
+            // };
+
             if (data.success && data.data) {
-                // API trả: "task_id: uuid"
                 this.taskId = data.data.split(':')[1].trim();
                 this.logs.log(`Task submitted successfully. Task ID: ${this.taskId}`);
                 this.logOffset = 0;
+                this.polling = true;
 
-                // bắt đầu poll log
-                this.pollLogs();
+                this.pollLogs(); 
             } else {
                 throw new Error(data.message || 'Unknown API error');
             }
-
         } catch (err) {
-            this.logs.log(`Error submitting task: ${err.message}`);
+            this.logs.log(`Error submitting task: ${err.message}`, 'red');
+            this.startBtn.textContent = 'Start Training';
         } finally {
             this.startBtn.disabled = false;
         }
     }
 
+    stopTraining() {
+        this.polling = false;
+        this.startBtn.textContent = 'Start Training';
+        this.taskId = null;
+        this.logs.log('Training stopped by user', 'yellow');
+    }
+
     async pollLogs() {
-        if (!this.taskId) return;
+        if (!this.taskId || !this.polling) return;
 
         const poll = async () => {
+            if (!this.polling) return;
             try {
                 const url = `http://10.0.0.238:8083/training/task/${this.taskId}/logs?offset=${this.logOffset}&limit=10`;
                 const res = await fetch(url, {
@@ -111,18 +129,21 @@ class App {
                     }
 
                     this.logOffset = next_offset || this.logOffset;
-
-                    if (status === 'processing') {
+                    
+                    this.logs.log(`status: ${status} | polling: ${this.polling}`)
+                    if (status === 'processing' && this.polling) {
                         setTimeout(poll, 1000); 
                     } else {
                         this.logs.log(`Task finished with status: ${status}`, 'yellow');
+                        this.startBtn.textContent = 'Start Training';
+                        this.polling = false;
                     }
                 } else {
                     throw new Error(data.message || 'Unknown API error');
                 }
             } catch (err) {
                 this.logs.log(`Error fetching logs: ${err.message}`, 'red');
-                setTimeout(poll, 2000); 
+                if (this.polling) setTimeout(poll, 2000);
             }
         };
 
@@ -135,7 +156,7 @@ class App {
     }
 }
 
-// Initialize app after components are loaded
+
 window.initApp = () => {
     new App();
 };

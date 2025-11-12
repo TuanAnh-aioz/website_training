@@ -27,16 +27,21 @@ export class TrainingLogs {
         if (!text) return;
 
         const li = document.createElement('li');
-        const now = new Date().toLocaleTimeString();
+
+        const now = new Date();
+        const logTime = now.getFullYear() + '-' +
+                        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(now.getDate()).padStart(2, '0') + ' ' +
+                        String(now.getHours()).padStart(2, '0') + ':' +
+                        String(now.getMinutes()).padStart(2, '0') + ':' +
+                        String(now.getSeconds()).padStart(2, '0');
 
         const match = text.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}),\d+\s+(?:aioz_trainer\.[\w\.]+)\s+(\w+)\s+-\s+(.*)$/);
 
-        let logTime = now;
         let level = "INFO";
         let message = text;
 
         if (match) {
-            logTime = match[1];
             level = match[2];
             message = match[3];
         }
