@@ -305,3 +305,27 @@
 .modal-carousel .inference-box img {
   height: 250px;
 }
+
+
+.carousel-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.carousel-dot.active {
+  background: #38bdf8; /* màu nổi bật cho dot active */
+  transform: scale(1.2);
+}

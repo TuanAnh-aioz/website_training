@@ -80,6 +80,9 @@ export class TrainingResults {
                         output: item.querySelector('img').src,
                         label: item.querySelector('div').textContent
                     })));
+
+                    this.modalDots = this.modal.querySelector('.carousel-dots');
+                    this.updateModalDots();
                 }
             });
         }
@@ -206,6 +209,39 @@ export class TrainingResults {
     updateModalTrack() {
         const x = -this.modalItemWidth * this.modalIndex;
         this.modalTrack.style.transform = `translateX(${x}px)`;
+    }
+
+    updateModalDots() {
+        if(!this.modalDots) return;
+
+        this.modalDots.innerHTML = '';
+        this.modalItems.forEach((item, idx) => {
+            const dot = document.createElement('div');
+            dot.className = 'carousel-dot';
+            if(idx === this.modalIndex) dot.classList.add('active');
+
+            dot.addEventListener('click', () => {
+                this.modalIndex = idx;
+                this.updateModalTrack();
+            });
+
+            this.modalDots.appendChild(dot);
+        });
+    }
+
+    // --- Cập nhật vị trí ảnh + active dot ---
+    updateModalTrack() {
+        const x = -this.modalItemWidth * this.modalIndex;
+        this.modalTrack.style.transform = `translateX(${x}px)`;
+
+        // Update dots
+        if(this.modalDots) {
+            const dots = this.modalDots.querySelectorAll('.carousel-dot');
+            dots.forEach((dot, idx) => {
+                if(idx === this.modalIndex) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+        }
     }
 
 
