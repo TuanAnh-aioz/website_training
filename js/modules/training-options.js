@@ -72,7 +72,7 @@ export class TrainingOptions {
 
             setInterval(() => {
                 this.fetchPlatforms();
-            }, 10000);
+            }, 5000);
 
             this.renderAll();
         }, 100);

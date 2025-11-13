@@ -16,39 +16,12 @@ class App {
         this.logOffset = 0;
         this.apiToken = 'zxzfvsddsa';
         this.polling = false; 
+        this.taskType = null
 
         this.initializeControls();
         this.logs.log('UI ready');
+ 
 
-        const examples = [
-            { output: './public/images/cat_4004.jpg', label: 'cat' },
-            { output: './public/images/cat_4019.jpg', label: 'cat' },
-            { output: './public/images/cat_4014.jpg', label: 'cat' },
-            { output: './public/images/cat_4019.jpg', label: 'cat' },
-            { output: './public/images/cat_4004.jpg', label: 'cat' },
-            { output: './public/images/cat_4019.jpg', label: 'cat' },
-            { output: './public/images/cat_4014.jpg', label: 'cat' },
-            { output: './public/images/cat_4004.jpg', label: 'cat' },
-            { output: './public/images/cat_4014.jpg', label: 'cat' },
-            { output: './public/images/cat_4004.jpg', label: 'cat' },
-            { output: './public/images/cat_4014.jpg', label: 'cat' },
-        ];
-        this.results.updateInferenceCarousel(examples);
-        const meta_data = {
-                resource: {
-                    system_ram: {
-                        total: 9355000000,
-                        usage: 1201000000
-                    },
-                    gpu_memory: {
-                        total: 5264000000,
-                        usage: 1477000000
-                    }
-                },
-                processing_time: 4.83676099777222
-            }
-
-        this.results.updateSystemStats(meta_data)
     }
 
     initializeControls() {
@@ -74,6 +47,7 @@ class App {
         const options = this.options.getCurrentOptions();
         const config = this.options.buildTrainingConfig(options);
 
+        this.taskType = options.task
         this.startBtn.disabled = true;
         this.logs.log('Submitting training task to server...');
         this.progress.totalEpochs = config.epochs
@@ -95,7 +69,7 @@ class App {
             
             const data = {
                 success: true,
-                data: "linux: 1b2fc81a-c914-469c-8891-cb278cefe32e"
+                data: "linux: 994e72cf-6b9d-4068-b391-3b2d5cca59ea"
             };
 
             if (data.success && data.data) {
@@ -184,6 +158,8 @@ class App {
                         this.logs.log(`Task finished with status: ${status}`, 'yellow');
                         this.startBtn.textContent = 'Start Training';
                         this.polling = false;
+
+                        this.fetchTaskResult();
                     }
                 } else {
                     throw new Error(data.message || 'Unknown API error');
@@ -195,6 +171,37 @@ class App {
         };
 
         poll();
+    }
+
+    async fetchTaskResult() {
+        if (!this.taskId) return;
+
+        try {
+            const res = await fetch(`http://10.0.0.238:8083/training/task/info/${this.taskId}`, {
+                headers: {
+                    'accept': 'application/json',
+                    'api-token': this.apiToken
+                }
+            });
+
+            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+            const data = await res.json();
+            // console.log(data)
+
+            if (data.success && data.data) {
+                const data_api = data.data;           
+                const resultInfo = data_api.result;   
+                const metaData = resultInfo.meta_data;  
+                console.log(resultInfo.result.examples)
+
+                this.results.updateSystemStats(metaData);
+                // this.results.updateInferenceCarousel(resultInfo.result.examples);        
+            } else {
+                throw new Error(data.message || 'Unknown API error');
+            }
+        } catch (err) {
+            this.logs.log(`Error fetching task result: ${err.message}`, 'red');
+        }
     }
 
     clearUI() {
