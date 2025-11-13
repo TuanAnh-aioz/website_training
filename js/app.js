@@ -152,6 +152,7 @@ class App {
                                 const accuracy = accMatch ? (parseFloat(accMatch[1]) * 100).toFixed(2) : null;
 
                                 this.progress.updateProgress(epoch, trainLoss, accuracy)
+                                this.results.updateLossHistory(trainLoss)
                             }
                             this.logs.log(text, color); 
                         });

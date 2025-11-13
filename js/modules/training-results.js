@@ -291,9 +291,8 @@ export class TrainingResults {
         img.src = url;
     }
 
-    updateLossHistory(loss, valLoss) {
+    updateLossHistory(loss) {
         this.lossHistory.push(Number(loss));
-        this.valLossHistory.push(Number(valLoss));
         this.updateLossChart();
     }
 
@@ -301,16 +300,18 @@ export class TrainingResults {
         try {
             const svg = document.getElementById('lossSvg');
             const lossLine = document.getElementById('lossLine');
-            const valLine = document.getElementById('valLine');
-            if(!svg || !lossLine || !valLine) return;
+            if (!svg || !lossLine) return;
+
             const w = 180;
             const h = 90;
             const n = Math.max(this.lossHistory.length, 1);
-            const maxVal = Math.max(1, Math.max(...this.lossHistory.concat(this.valLossHistory), 1));
+            const maxVal = Math.max(1, Math.max(...this.lossHistory, 1));
+
             const gridLines = svg.querySelector('.grid-lines');
             gridLines.innerHTML = '';
+
             const ySteps = 5;
-            for(let i = 0; i <= ySteps; i++) {
+            for (let i = 0; i <= ySteps; i++) {
                 const y = 110 - (h * i / ySteps);
                 const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
                 line.setAttribute("x1", "40");
@@ -318,6 +319,7 @@ export class TrainingResults {
                 line.setAttribute("x2", "220");
                 line.setAttribute("y2", y.toString());
                 gridLines.appendChild(line);
+
                 if (i > 0) {
                     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                     text.setAttribute("x", "32");
@@ -325,12 +327,13 @@ export class TrainingResults {
                     text.setAttribute("text-anchor", "end");
                     text.setAttribute("class", "axis-label");
                     text.setAttribute("fill", "#ffffff");
-                    text.textContent = ((maxVal * i/ySteps).toFixed(2));
+                    text.textContent = ((maxVal * i / ySteps).toFixed(2));
                     gridLines.appendChild(text);
                 }
             }
+
             const xSteps = Math.min(n, 8);
-            for(let i = 0; i <= xSteps; i++) {
+            for (let i = 0; i <= xSteps; i++) {
                 const x = 40 + (w * i / xSteps);
                 const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
                 line.setAttribute("x1", x.toString());
@@ -338,6 +341,7 @@ export class TrainingResults {
                 line.setAttribute("x2", x.toString());
                 line.setAttribute("y2", "110");
                 gridLines.appendChild(line);
+
                 if (i > 0) {
                     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                     text.setAttribute("x", x.toString());
@@ -345,26 +349,23 @@ export class TrainingResults {
                     text.setAttribute("text-anchor", "middle");
                     text.setAttribute("class", "axis-label");
                     text.setAttribute("fill", "#ffffff");
-                    text.textContent = Math.round((i * (n-1)/xSteps)).toString();
+                    text.textContent = Math.round((i * (n - 1) / xSteps)).toString();
                     gridLines.appendChild(text);
                 }
             }
-            const pointsLoss = this.lossHistory.map((v,i) => {
-                const x = (n===1) ? 0 : (i/(n-1))*w;
-                const y = 110 - ((v/maxVal)*h + 20);
+
+            const pointsLoss = this.lossHistory.map((v, i) => {
+                const x = (n === 1) ? 0 : (i / (n - 1)) * w;
+                const y = 110 - ((v / maxVal) * h + 20);
                 return `${x.toFixed(2)},${y.toFixed(2)}`;
             }).join(' ');
-            const pointsVal = this.valLossHistory.map((v,i) => {
-                const x = (n===1) ? 0 : (i/(n-1))*w;
-                const y = 110 - ((v/maxVal)*h + 20);
-                return `${x.toFixed(2)},${y.toFixed(2)}`;
-            }).join(' ');
+
             lossLine.setAttribute('points', pointsLoss);
-            valLine.setAttribute('points', pointsVal);
-        } catch(e) {
+        } catch (e) {
             console.warn('updateLossChart', e);
         }
     }
+
 
     downloadModel() {
         const epochInput = document.getElementById('epochs');
