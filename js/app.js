@@ -46,7 +46,7 @@ class App {
 
         this.startBtn.disabled = true;
         this.logs.log('Submitting training task to server...');
-
+        this.progress.totalEpochs = config.epochs
         try {
             const res = await fetch('http://10.0.0.238:8083/training/task/create', {
                 method: 'POST',
@@ -122,7 +122,22 @@ class App {
                             if (text.includes('WARNING')) color = 'orange';
                             else if (text.includes('ERROR')) color = 'red';
                             else if (text.includes('INFO')) color = '#7fbfff';
+                            
+                            const epochRegex = /Epoch\s+(\d+)/i;
+                            const trainLossRegex = /Train\s+Loss\s*=\s*([\d.]+)/i;
+                            const accuracyRegex = /'accuracy'\s*:\s*([\d.]+)/i;
+                            
+                            const epochMatch = text.match(epochRegex);
+                            const lossMatch = text.match(trainLossRegex);
+                            const accMatch = text.match(accuracyRegex);
 
+                            if (epochMatch || lossMatch || accMatch) {
+                                const epoch = epochMatch ? parseInt(epochMatch[1]) : null;
+                                const trainLoss = lossMatch ? parseFloat(lossMatch[1]) : null;
+                                const accuracy = accMatch ? (parseFloat(accMatch[1]) * 100).toFixed(2) : null;
+
+                                this.progress.updateProgress(epoch, trainLoss, accuracy)
+                            }
                             this.logs.log(text, color); 
                         });
 
@@ -131,8 +146,7 @@ class App {
                     }
 
                     this.logOffset = next_offset || this.logOffset;
-                    
-                    this.logs.log(`status: ${status} | polling: ${this.polling}`)
+
                     if (status === 'processing' && this.polling) {
                         setTimeout(poll, 1000); 
                     } else {

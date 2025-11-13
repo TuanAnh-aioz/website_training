@@ -90,7 +90,6 @@
 
 /* Keep add/select line same width as transforms */
 .transform-add .transform-select { flex:1; }
-.transform-add .btn-add { width:44px; }
 
 /* preview monospace */
 #platformPreview { max-height:160px; overflow:auto; }

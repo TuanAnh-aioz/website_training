@@ -8,11 +8,11 @@ export class TrainingProgress {
         this.progressBar = document.querySelector('#globalProgress > div');
         
         this.epoch = 0;
-        this.totalEpochs = 5;
+        this.totalEpochs = 0;
         this.running = false;
     }
 
-    updateProgress(epoch, loss, acc, valLoss) {
+    updateProgress(epoch, loss, acc) {
         this.epochEl.textContent = `${epoch}/${this.totalEpochs}`;
         this.lossEl.textContent = loss;
         // Normalize accuracy: strip any '%' characters and whitespace, then append one '%'
@@ -28,7 +28,7 @@ export class TrainingProgress {
             // fallback
             this.accEl.textContent = String(acc);
         }
-        this.valLossEl.textContent = valLoss;
+        // this.valLossEl.textContent = valLoss;
         
         const pct = Math.round((epoch/this.totalEpochs)*100);
         this.progressBar.style.width = pct + '%';
