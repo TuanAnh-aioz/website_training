@@ -1,8 +1,7 @@
 <aside class="rightpanel results-panel">
   <div class="result-main-tag">Training Results</div>
   <div class="result-card">
-    <div class="result-header">Inference Result
-    </div>
+    <div class="result-header">Inference Result</div>
 
     <div class="result-content">
       <div class="inference-result-carousel">
@@ -46,12 +45,40 @@
         <div class="loss-legend">
           <div class="loss-info">
             <span class="legend"><span class="dot loss-dot"></span> Loss</span>
-            <!-- <span class="legend"><span class="dot val-dot"></span> Val Loss</span> -->
           </div>
         </div>
       </div>
     </div>
   </div>
+
+
+  <div class="inference-meta">
+    <div class="meta-header">System Resource</div>
+
+    <div class="meta-section">
+      <div class="meta-card">
+        <div class="meta-title">RAM Usage</div>
+        <div class="meta-bar">
+          <div class="meta-fill ram"></div>
+        </div>
+        <div class="meta-info" id="ram-info">0 / 0 GB</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-title">GPU Memory</div>
+        <div class="meta-bar">
+          <div class="meta-fill gpu"></div>
+        </div>
+        <div class="meta-info" id="gpu-info">0 / 0 GB</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-title">Processing Time</div>
+        <div class="meta-value" id="processing-time">0 s</div>
+      </div>
+    </div>
+  </div>
+
 
   <div class="result-card">
     <div class="result-header">Model Info</div>

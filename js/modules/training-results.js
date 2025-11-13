@@ -255,6 +255,30 @@ export class TrainingResults {
         }
     }
 
+    updateSystemStats(meta_data) {
+        const ramFill = document.querySelector('.meta-fill.ram');
+        const gpuFill = document.querySelector('.meta-fill.gpu');
+        const ramInfo = document.getElementById('ram-info');
+        const gpuInfo = document.getElementById('gpu-info');
+        const processingTime = document.getElementById('processing-time');
+
+        const ramUsageGB = (meta_data.resource.system_ram.usage / 1e9).toFixed(2);
+        const ramTotalGB = (meta_data.resource.system_ram.total / 1e9).toFixed(2);
+        const gpuUsageGB = (meta_data.resource.gpu_memory.usage / 1e9).toFixed(2);
+        const gpuTotalGB = (meta_data.resource.gpu_memory.total / 1e9).toFixed(2);
+
+        const ramPercent = (meta_data.resource.system_ram.usage / meta_data.resource.system_ram.total) * 100;
+        const gpuPercent = (meta_data.resource.gpu_memory.usage / meta_data.resource.gpu_memory.total) * 100;
+
+        ramFill.style.width = `${ramPercent}%`;
+        gpuFill.style.width = `${gpuPercent}%`;
+
+        ramInfo.textContent = `${ramUsageGB} / ${ramTotalGB} GB`;
+        gpuInfo.textContent = `${gpuUsageGB} / ${gpuTotalGB} GB`;
+        processingTime.textContent = `${meta_data.processing_time.toFixed(2)} s`;
+    }
+
+
     updateEpoch(epoch) {
         const el = document.getElementById('trainingTitleEpoch');
         if (el) el.textContent = String(epoch);

@@ -59,8 +59,8 @@ body {
   padding: 18px;
   box-shadow: 0 6px 18px rgba(2,6,23,0.6);
 
-  height: 87vh;       
-  max-height: 90vh;   
+  /* height: 90vh;        */
+  /* max-height: 90vh;    */
   display: flex;
   flex-direction: column;
   gap: 16px;       

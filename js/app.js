@@ -34,6 +34,21 @@ class App {
             { output: './public/images/cat_4014.jpg', label: 'cat' },
         ];
         this.results.updateInferenceCarousel(examples);
+        const meta_data = {
+                resource: {
+                    system_ram: {
+                        total: 9355000000,
+                        usage: 1201000000
+                    },
+                    gpu_memory: {
+                        total: 5264000000,
+                        usage: 1477000000
+                    }
+                },
+                processing_time: 4.83676099777222
+            }
+
+        this.results.updateSystemStats(meta_data)
     }
 
     initializeControls() {
