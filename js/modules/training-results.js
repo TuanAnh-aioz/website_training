@@ -43,7 +43,6 @@ export class TrainingResults {
         }
     }
 
-    // --- Carousel setup ---
     initializeCarousel() {
         this.carousel = document.querySelector(this.carouselSelector);
         if (!this.carousel) return;
@@ -124,7 +123,6 @@ export class TrainingResults {
         this.nextBtn.style.display = this.carouselIndex >= this.carouselItems.length - this.visibleItems ? 'none' : 'block';
     }
 
-    // --- Update Carousel with inference data ---
     updateInferenceCarousel(examples) {
         if (!this.carouselTrack) return;
 
@@ -138,8 +136,9 @@ export class TrainingResults {
             img.alt = ex.label;
 
             const label = document.createElement('div');
-            label.textContent = ex.label;
             label.className = 'label';
+            label.textContent = ex.label;
+            
 
             box.appendChild(img);
             box.appendChild(label);
@@ -152,7 +151,6 @@ export class TrainingResults {
         this.updateTrack();
     }
 
-    // --- Modal Carousel setup ---
     initializeModal() {
         if (!this.modal) return;
         this.modalTrack = this.modal.querySelector('.carousel-track');
@@ -217,11 +215,6 @@ export class TrainingResults {
         this.modalItemWidth = this.modalItems[0].getBoundingClientRect().width + parseInt(style.marginRight);
     }
 
-    updateModalTrack() {
-        const x = -this.modalItemWidth * this.modalIndex;
-        this.modalTrack.style.transform = `translateX(${x}px)`;
-    }
-
     updateModalDots() {
         if(!this.modalDots) return;
 
@@ -240,23 +233,28 @@ export class TrainingResults {
         });
     }
 
-    // --- Cập nhật vị trí ảnh + active dot ---
     updateModalTrack() {
-        const x = -this.modalItemWidth * this.modalIndex;
-        this.modalTrack.style.transform = `translateX(${x}px)`;
+        const centerX = this.modalTrack.offsetWidth / 2;
+
+        this.modalItems.forEach((item, idx) => {
+            const offset = idx - this.modalIndex;
+            const scale = Math.max(0.5, 1 - Math.abs(offset) * 0.2);
+            const translateX = offset * (this.modalItemWidth / 2);
+
+            item.style.transform = `translateX(${translateX}px) scale(${scale})`;
+            item.style.zIndex = 10 - Math.abs(offset);
+            item.style.opacity = scale;
+        });
 
         // Update dots
         if(this.modalDots) {
             const dots = this.modalDots.querySelectorAll('.carousel-dot');
             dots.forEach((dot, idx) => {
-                if(idx === this.modalIndex) dot.classList.add('active');
-                else dot.classList.remove('active');
+                dot.classList.toggle('active', idx === this.modalIndex);
             });
         }
     }
 
-
-    // --- rest of original TrainingResults class ---
     updateEpoch(epoch) {
         const el = document.getElementById('trainingTitleEpoch');
         if (el) el.textContent = String(epoch);
@@ -291,6 +289,12 @@ export class TrainingResults {
             document.body.removeChild(a);
         };
         img.src = url;
+    }
+
+    updateLossHistory(loss, valLoss) {
+        this.lossHistory.push(Number(loss));
+        this.valLossHistory.push(Number(valLoss));
+        this.updateLossChart();
     }
 
     updateLossChart() {
@@ -378,12 +382,6 @@ export class TrainingResults {
         document.body.appendChild(a);
         a.click();
         a.remove();
-    }
-
-    updateLossHistory(loss, valLoss) {
-        this.lossHistory.push(Number(loss));
-        this.valLossHistory.push(Number(valLoss));
-        this.updateLossChart();
     }
 
     reset() {
