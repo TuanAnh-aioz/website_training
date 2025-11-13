@@ -6,7 +6,6 @@ export class TrainingResults {
         this.tagTask = document.getElementById('tagTask');
         this.tagModel = document.getElementById('tagModel');
         this.tagParams = document.getElementById('tagParams');
-        this.tagTime = document.getElementById('tagTime');
 
         this.lossHistory = [];
         this.valLossHistory = [];
@@ -419,7 +418,6 @@ export class TrainingResults {
         this.updateLossChart();
         if(this.tagModel) this.tagModel.textContent = '';
         if(this.tagParams) this.tagParams.textContent = '';
-        if(this.tagTime) this.tagTime.textContent = '';
         if(this.tagTask) this.tagTask.textContent = '';
         // reset carousel
         if(this.carouselTrack) this.carouselTrack.innerHTML = '';
@@ -434,10 +432,9 @@ export class TrainingResults {
         ).join(' ');
     }
 
-    updateInfo(options, time) {
+    updateInfo(options) {
         if(this.tagModel) this.tagModel.textContent = this.formatModelName(options.model);
         if(this.tagParams) this.tagParams.textContent = String(options.params);
-        if(this.tagTime) this.tagTime.textContent = String(time);
         if(this.tagTask) this.tagTask.textContent = this.formatModelName(options.task);
     }
 }

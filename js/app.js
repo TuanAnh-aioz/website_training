@@ -34,6 +34,7 @@ class App {
         if(this.startBtn.textContent === 'Start Training') {
             this.startBtn.textContent = 'Stop Training';
             await this.submitTask();
+            
         } else {
             this.stopTraining();
         }
@@ -46,6 +47,7 @@ class App {
 
         const options = this.options.getCurrentOptions();
         const config = this.options.buildTrainingConfig(options);
+        this.results.updateInfo(options)
 
         this.taskType = options.task
         this.startBtn.disabled = true;
