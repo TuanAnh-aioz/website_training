@@ -5,13 +5,14 @@
   padding: 1rem;
 }
 
-.result-card {
+
+.result-card-infer, .result-card-meta, .result-card-info {
   background: #1a1a1a;
   border-radius: 8px;
   overflow: hidden;
 }
 
-.result-header {
+.infer-header, .meta-header, .info-header {
   padding: 0.75rem 1rem;
   font-size: 0.9rem;
   font-weight: 500;
@@ -22,11 +23,10 @@
   align-items: center;
 }
 
-.result-content {
+.infer-content, .meta-content, .info-content {
   padding: 1rem;
 }
 
-/* Inference Result styles */
 .inference-result {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -34,57 +34,23 @@
   min-height: 150px;
 }
 
-.inference-box {
-  border: 1px solid #333;
-  border-radius: 4px;
-  background: #0d0d0d;
-  height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #666;
-  font-size: 0.9rem;
+.result-subheader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+  gap:12px;
 }
-
-/* Training Result styles */
-.training-result {
-  min-height: 160px; /* reduced height to make chart frame smaller */
-  padding: 0.75rem;  /* slightly tighter padding */
-  position: relative;
+.result-subheader h3{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin:0;
+  flex:1 1 auto;
+  font-size:16px;
+  color:#e6eef8;
 }
-
-.training-epoch {
-  position: absolute;
-  top: 0.5rem;
-  right: 1rem;
-  font-size: 0.85rem;
-  color: #888;
-}
-
-.chart-container {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%);
-  border-radius: 8px;
-  padding: 8px; /* reduced padding for a tighter frame */
-  margin-bottom: 8px;
-}
-
-.axis-label {
-  fill: rgba(255,255,255,0.85);
-  font-size: 10px;
-  font-family: system-ui, -apple-system, sans-serif;
-  font-weight: 400;
-}
-
-
-.loss-info {
-  display: flex;
-  gap: 12px;
-}
-
-.loss-actions {
-  display: flex;
-  gap: 8px;
-}
+.result-controls{display:flex;gap:8px;flex-shrink:0}
 
 .icon-button {
   width: 28px;
@@ -107,33 +73,6 @@
   border-color: rgba(255,255,255,0.2);
 }
 
-.training-subtitle {
-  margin: 10px 0 14px 0;
-  color: #cfe7ff;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-/* Scoped header inside result cards (copy of logs header styles but scoped) */
-.result-subheader{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:8px;
-  gap:12px;
-}
-.result-subheader h3{
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  margin:0;
-  flex:1 1 auto;
-  font-size:16px;
-  color:#e6eef8;
-}
-.result-controls{display:flex;gap:8px;flex-shrink:0}
-
-/* Top tag shown above the inference/result cards */
 .result-main-tag{
   display:inline-block;
   color:#ffffff;
@@ -144,7 +83,6 @@
   margin:0 0 8px 0;
 }
 
-/* Model Info styles */
 .model-info-grid {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -404,20 +342,20 @@
 }
 
 .meta-header::after {
-  content: "";
-  position: absolute;
-  bottom: -10px; 
+  bottom: -10px;
+  width: 60%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.4);
   left: 0;
-  width: 100%;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.2);
   border-radius: 1px;
 }
 
 .meta-section {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1.2rem;
+  align-items: center;      
+  padding-bottom: 1rem;      
 }
 
 .meta-card {
@@ -426,6 +364,9 @@
   padding: 0.6rem 0.8rem;
   display: flex;
   flex-direction: column;
+  width: 90%;      
+  max-width: 250px; 
+  box-sizing: border-box;
 }
 
 .meta-title {
@@ -462,4 +403,48 @@
 .meta-value {
   font-size: 0.8rem;
   color: #aaa;
+}
+
+
+.result-card-loss {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.8rem;
+}
+
+.loss-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5rem;
+}
+
+.loss-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#lossSvg {
+  width: 100%;
+  max-width: 260px;
+  height: 140px;
+}
+
+#lossSvg line {
+  stroke: rgba(255,255,255,0.2);
+  stroke-width: 1;
+}
+
+.axis-label {
+  font-size: 0.7rem;
+  fill: #fff;
 }

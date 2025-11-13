@@ -1,9 +1,8 @@
 <aside class="rightpanel results-panel">
   <div class="result-main-tag">Training Results</div>
-  <div class="result-card">
-    <div class="result-header">Inference Result</div>
-
-    <div class="result-content">
+  <div class="result-card-infer">
+    <div class="infer-header">Inference Result</div>
+    <div class="infer-content">
       <div class="inference-result-carousel">
         <div class="carousel-track"></div>
         <button class="carousel-btn prev">&#10094;</button>
@@ -11,50 +10,8 @@
       </div>
     </div>
   </div>
-
-  <div class="result-card">
-    <div class="result-header">
-      <span>Model Loss</span>
-      <button id="downloadChartBtn" class="icon-button" title="Download chart">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
-    <div class="result-content">
-      <div class="training-result">
-        <div class="training-subtitle">Epoch <span id="trainingTitleEpoch">0</span></div>
-        <div class="chart-container">
-          <svg id="lossSvg" viewBox="0 0 240 140" preserveAspectRatio="none">
-=            <g class="grid-lines" stroke="rgba(255,255,255,0.1)" stroke-width="1">
-            </g>
-            <defs>
-              <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-                <path d="M 0 0 L 6 3 L 0 6 z" fill="rgba(255,255,255,0.5)"/>
-              </marker>
-            </defs>
-            <line class="axis" x1="40" y1="110" x2="220" y2="110" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-            <line class="axis" x1="40" y1="110" x2="40" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-            <circle cx="40" cy="110" r="2" fill="rgba(255,255,255,0.4)"/>
-            <g transform="translate(40,0)">
-              <polyline id="lossLine" fill="none" stroke="#38bdf8" stroke-width="2" points="" />
-              <polyline id="valLine" fill="none" stroke="#f59e0b" stroke-width="2" points="" />
-            </g>
-          </svg>
-        </div>
-        <div class="loss-legend">
-          <div class="loss-info">
-            <span class="legend"><span class="dot loss-dot"></span> Loss</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <div class="inference-meta">
+  <div class="result-card-meta">
     <div class="meta-header">System Resource</div>
-
     <div class="meta-section">
       <div class="meta-card">
         <div class="meta-title">RAM Usage</div>
@@ -63,7 +20,6 @@
         </div>
         <div class="meta-info" id="ram-info">0 / 0 GB</div>
       </div>
-
       <div class="meta-card">
         <div class="meta-title">GPU Memory</div>
         <div class="meta-bar">
@@ -71,18 +27,31 @@
         </div>
         <div class="meta-info" id="gpu-info">0 / 0 GB</div>
       </div>
-
       <div class="meta-card">
         <div class="meta-title">Processing Time</div>
         <div class="meta-value" id="processing-time">0 s</div>
       </div>
     </div>
   </div>
-
-
-  <div class="result-card">
-    <div class="result-header">Model Info</div>
-    <div class="result-content">
+  <div class="result-card-loss">
+    <div class="loss-header">
+      <span>Model Loss</span>
+      <button id="downloadChartBtn" class="icon-button" title="Download chart">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="loss-content">
+      <svg id="lossSvg" width="260" height="140">
+        <g class="grid-lines"></g>
+        <polyline id="lossLine" fill="none" stroke="#38bdf8" stroke-width="2"/>
+      </svg>
+    </div>
+  </div>
+  <div class="result-card-info">
+    <div class="info-header">Model Info</div>
+    <div class="info-content">
       <div class="model-info-grid">
         <div class="info-label">Model Type</div>
         <div class="info-value" id="tagModel"></div>
@@ -95,7 +64,6 @@
       </div>
     </div>
   </div>
-  
   <button id="downloadBtn" class="secondary">Download Model</button>
 </aside>
 

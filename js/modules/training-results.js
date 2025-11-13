@@ -55,7 +55,7 @@ export class TrainingResults {
         if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.moveNext());
         window.addEventListener('resize', () => this.updateItemWidth());
 
-        const header = this.carousel.closest('.result-card')?.querySelector('.result-header');
+        const header = this.carousel.closest('.result-card-infer')?.querySelector('.infer-header');
         if (header) {
             const showBtn = document.createElement('button');
             showBtn.className = 'icon-button';
@@ -321,73 +321,77 @@ export class TrainingResults {
     }
 
     updateLossChart() {
-        try {
-            const svg = document.getElementById('lossSvg');
-            const lossLine = document.getElementById('lossLine');
-            if (!svg || !lossLine) return;
+        const svg = document.getElementById('lossSvg');
+        const lossLine = document.getElementById('lossLine');
+        if (!svg || !lossLine) return;
 
-            const w = 180;
-            const h = 90;
-            const n = Math.max(this.lossHistory.length, 1);
-            const maxVal = Math.max(1, Math.max(...this.lossHistory, 1));
+        const w = 200;
+        const h = 90;
+        const paddingTop = 20;
+        const paddingBottom = 20;
+        const paddingLeft = 40;
+        const paddingRight = 20;
 
-            const gridLines = svg.querySelector('.grid-lines');
-            gridLines.innerHTML = '';
+        const n = Math.max(this.lossHistory.length, 1);
+        const maxVal = Math.max(1, Math.max(...this.lossHistory));
 
-            const ySteps = 5;
-            for (let i = 0; i <= ySteps; i++) {
-                const y = 110 - (h * i / ySteps);
-                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                line.setAttribute("x1", "40");
-                line.setAttribute("y1", y.toString());
-                line.setAttribute("x2", "220");
-                line.setAttribute("y2", y.toString());
-                gridLines.appendChild(line);
+        const gridLines = svg.querySelector('.grid-lines');
+        gridLines.innerHTML = '';
 
-                if (i > 0) {
-                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    text.setAttribute("x", "32");
-                    text.setAttribute("y", (y + 4).toString());
-                    text.setAttribute("text-anchor", "end");
-                    text.setAttribute("class", "axis-label");
-                    text.setAttribute("fill", "#ffffff");
-                    text.textContent = ((maxVal * i / ySteps).toFixed(2));
-                    gridLines.appendChild(text);
-                }
+        // Trục Y
+        const ySteps = 5;
+        for (let i = 0; i <= ySteps; i++) {
+            const y = paddingTop + ((h) * (ySteps - i) / ySteps);
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", paddingLeft);
+            line.setAttribute("y1", y);
+            line.setAttribute("x2", w + paddingLeft);
+            line.setAttribute("y2", y);
+            line.setAttribute("stroke", "rgba(255,255,255,0.2)");
+            gridLines.appendChild(line);
+
+            if (i > 0) {
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", paddingLeft - 4);
+                text.setAttribute("y", y + 4);
+                text.setAttribute("text-anchor", "end");
+                text.setAttribute("class", "axis-label");
+                text.textContent = (maxVal * i / ySteps).toFixed(2);
+                gridLines.appendChild(text);
             }
-
-            const xSteps = Math.min(n, 8);
-            for (let i = 0; i <= xSteps; i++) {
-                const x = 40 + (w * i / xSteps);
-                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                line.setAttribute("x1", x.toString());
-                line.setAttribute("y1", "20");
-                line.setAttribute("x2", x.toString());
-                line.setAttribute("y2", "110");
-                gridLines.appendChild(line);
-
-                if (i > 0) {
-                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    text.setAttribute("x", x.toString());
-                    text.setAttribute("y", "125");
-                    text.setAttribute("text-anchor", "middle");
-                    text.setAttribute("class", "axis-label");
-                    text.setAttribute("fill", "#ffffff");
-                    text.textContent = Math.round((i * (n - 1) / xSteps)).toString();
-                    gridLines.appendChild(text);
-                }
-            }
-
-            const pointsLoss = this.lossHistory.map((v, i) => {
-                const x = (n === 1) ? 0 : (i / (n - 1)) * w;
-                const y = 110 - ((v / maxVal) * h + 20);
-                return `${x.toFixed(2)},${y.toFixed(2)}`;
-            }).join(' ');
-
-            lossLine.setAttribute('points', pointsLoss);
-        } catch (e) {
-            console.warn('updateLossChart', e);
         }
+
+        // Trục X
+        const xSteps = Math.min(n, 8);
+        for (let i = 0; i <= xSteps; i++) {
+            const x = paddingLeft + (w * i / xSteps);
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x);
+            line.setAttribute("y1", paddingTop);
+            line.setAttribute("x2", x);
+            line.setAttribute("y2", h + paddingTop);
+            line.setAttribute("stroke", "rgba(255,255,255,0.2)");
+            gridLines.appendChild(line);
+
+            if (i > 0) {
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", x);
+                text.setAttribute("y", h + paddingTop + 14);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("class", "axis-label");
+                text.textContent = Math.round((i * (n - 1) / xSteps)).toString();
+                gridLines.appendChild(text);
+            }
+        }
+
+        // Vẽ polyline
+        const pointsLoss = this.lossHistory.map((v, i) => {
+            const x = paddingLeft + (n === 1 ? 0 : (i / (n-1)) * w);
+            const y = paddingTop + h - (v / maxVal) * h;
+            return `${x},${y}`;
+        }).join(' ');
+
+        lossLine.setAttribute('points', pointsLoss);
     }
 
 
