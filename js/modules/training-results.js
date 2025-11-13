@@ -161,12 +161,23 @@ export class TrainingResults {
         this.modalCloseBtn = this.modal.querySelector('.modal-close');
 
         this.modalPrevBtn?.addEventListener('click', () => {
-            if (this.modalIndex > 0) this.modalIndex--;
+            if (this.modalItems.length === 0) return;
+
+            this.modalIndex--;
+            if (this.modalIndex < 0) this.modalIndex = this.modalItems.length - 1;
+
             this.updateModalTrack();
+            this.updateModalDots();
         });
+
         this.modalNextBtn?.addEventListener('click', () => {
-            if (this.modalIndex < this.modalItems.length - 1) this.modalIndex++;
+            if (this.modalItems.length === 0) return;
+
+            this.modalIndex++;
+            if (this.modalIndex >= this.modalItems.length) this.modalIndex = 0;
+
             this.updateModalTrack();
+            this.updateModalDots();
         });
         this.modalCloseBtn?.addEventListener('click', () => {
             this.modal.style.display = 'none';
