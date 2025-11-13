@@ -1,4 +1,4 @@
-// Training results module
+// Training results module with Carousel
 export class TrainingResults {
     constructor() {
         this.downloadBtn = document.getElementById('downloadBtn');
@@ -10,8 +10,18 @@ export class TrainingResults {
         
         this.lossHistory = [];
         this.valLossHistory = [];
+
+        // Carousel properties
+        this.carouselSelector = '.inference-result-carousel';
+        this.carouselTrack = null;
+        this.carouselItems = [];
+        this.carouselIndex = 0;
+        this.visibleItems = 2; 
+        this.prevBtn = null;
+        this.nextBtn = null;
         
         this.initializeControls();
+        this.initializeCarousel();
     }
 
     initializeControls() {
@@ -23,6 +33,84 @@ export class TrainingResults {
         }
     }
 
+    // --- Carousel setup ---
+    initializeCarousel() {
+        this.carousel = document.querySelector(this.carouselSelector);
+        if(!this.carousel) return;
+
+        this.carouselTrack = this.carousel.querySelector('.carousel-track');
+        this.prevBtn = this.carousel.querySelector('.prev');
+        this.nextBtn = this.carousel.querySelector('.next');
+
+        if(this.prevBtn) this.prevBtn.addEventListener('click', () => this.movePrev());
+        if(this.nextBtn) this.nextBtn.addEventListener('click', () => this.moveNext());
+        window.addEventListener('resize', () => this.updateItemWidth());
+    }
+
+    updateItemWidth() {
+        if(this.carouselItems.length === 0) return;
+
+        const style = getComputedStyle(this.carouselItems[0]);
+        this.itemWidth = this.carouselItems[0].getBoundingClientRect().width + parseInt(style.marginRight);
+
+        const containerWidth = this.carousel.getBoundingClientRect().width;
+        this.visibleItems = Math.floor(containerWidth / this.itemWidth);
+
+        this.updateTrack();
+    }
+
+    movePrev() {
+        if(this.carouselIndex > 0) this.carouselIndex--;
+        this.updateTrack();
+    }
+
+    moveNext() {
+        if(this.carouselIndex < this.carouselItems.length - this.visibleItems) this.carouselIndex++;
+        this.updateTrack();
+    }
+
+    updateTrack() {
+        if(!this.carouselTrack) return;
+        const x = -this.itemWidth * this.carouselIndex;
+        this.carouselTrack.style.transform = `translateX(${x}px)`;
+        this.updateButtons();
+    }
+
+    updateButtons() {
+        if(!this.prevBtn || !this.nextBtn) return;
+        this.prevBtn.style.display = this.carouselIndex === 0 ? 'none' : 'block';
+        this.nextBtn.style.display = this.carouselIndex >= this.carouselItems.length - this.visibleItems ? 'none' : 'block';
+    }
+
+    // --- Update Carousel with inference data ---
+    updateInferenceCarousel(examples) {
+        if(!this.carouselTrack) return;
+
+        this.carouselTrack.innerHTML = '';
+        this.carouselItems = examples.map(ex => {
+            const box = document.createElement('div');
+            box.className = 'inference-box';
+
+            const img = document.createElement('img');
+            img.src = ex.output;
+            img.alt = ex.label;
+
+            const label = document.createElement('div');
+            label.textContent = ex.label;
+
+            box.appendChild(img);
+            box.appendChild(label);
+            this.carouselTrack.appendChild(box);
+            return box;
+        });
+
+        this.carouselIndex = 0;
+        this.updateItemWidth();
+        this.updateTrack();
+    }
+
+
+    // --- rest of original TrainingResults class ---
     updateEpoch(epoch) {
         const el = document.getElementById('trainingTitleEpoch');
         if (el) el.textContent = String(epoch);
@@ -31,36 +119,23 @@ export class TrainingResults {
     downloadChart() {
         const svg = document.getElementById('lossSvg');
         if (!svg) return;
-
-        // Create a canvas with the same dimensions as the SVG
         const canvas = document.createElement('canvas');
         const w = svg.clientWidth || 200;
         const h = svg.clientHeight || 80;
-        canvas.width = w * 2; // Double size for better quality
+        canvas.width = w * 2;
         canvas.height = h * 2;
         const ctx = canvas.getContext('2d');
-        ctx.scale(2, 2); // Scale up for better quality
-
-        // Convert SVG to data URL
+        ctx.scale(2, 2);
         const svgData = new XMLSerializer().serializeToString(svg);
         const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
         const url = URL.createObjectURL(svgBlob);
-
-        // Create image from SVG and draw to canvas
         const img = new Image();
         img.onload = () => {
-            // Draw dark background
             ctx.fillStyle = '#1a1a1a';
             ctx.fillRect(0, 0, w, h);
-            
-            // Draw the SVG
             ctx.drawImage(img, 0, 0, w, h);
-            
-            // Ensure text is visible by setting composite operation
             ctx.globalCompositeOperation = 'source-over';
             URL.revokeObjectURL(url);
-
-            // Convert to PNG and download
             const pngUrl = canvas.toDataURL('image/png');
             const a = document.createElement('a');
             a.href = pngUrl;
@@ -78,19 +153,12 @@ export class TrainingResults {
             const lossLine = document.getElementById('lossLine');
             const valLine = document.getElementById('valLine');
             if(!svg || !lossLine || !valLine) return;
-
-            // Chart dimensions
-            const w = 180; // Width of plotting area
-            const h = 90; // Height of plotting area
+            const w = 180;
+            const h = 90;
             const n = Math.max(this.lossHistory.length, 1);
-            
             const maxVal = Math.max(1, Math.max(...this.lossHistory.concat(this.valLossHistory), 1));
-            
-            // Update grid lines
             const gridLines = svg.querySelector('.grid-lines');
             gridLines.innerHTML = '';
-            
-            // Add horizontal grid lines
             const ySteps = 5;
             for(let i = 0; i <= ySteps; i++) {
                 const y = 110 - (h * i / ySteps);
@@ -100,21 +168,17 @@ export class TrainingResults {
                 line.setAttribute("x2", "220");
                 line.setAttribute("y2", y.toString());
                 gridLines.appendChild(line);
-                
-                // Add y-axis labels
-                if (i > 0) { // Skip 0 as it's on the x-axis
+                if (i > 0) {
                     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                     text.setAttribute("x", "32");
                     text.setAttribute("y", (y + 4).toString());
                     text.setAttribute("text-anchor", "end");
                     text.setAttribute("class", "axis-label");
-                    text.setAttribute("fill", "#ffffff"); // Ensure visible in download
+                    text.setAttribute("fill", "#ffffff");
                     text.textContent = ((maxVal * i/ySteps).toFixed(2));
                     gridLines.appendChild(text);
                 }
             }
-            
-            // Add vertical grid lines
             const xSteps = Math.min(n, 8);
             for(let i = 0; i <= xSteps; i++) {
                 const x = 40 + (w * i / xSteps);
@@ -124,33 +188,27 @@ export class TrainingResults {
                 line.setAttribute("x2", x.toString());
                 line.setAttribute("y2", "110");
                 gridLines.appendChild(line);
-                
-                // Add x-axis labels
-                if (i > 0) { // Skip 0 as it's on the y-axis
+                if (i > 0) {
                     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                     text.setAttribute("x", x.toString());
                     text.setAttribute("y", "125");
                     text.setAttribute("text-anchor", "middle");
                     text.setAttribute("class", "axis-label");
-                    text.setAttribute("fill", "#ffffff"); // Ensure visible in download
+                    text.setAttribute("fill", "#ffffff");
                     text.textContent = Math.round((i * (n-1)/xSteps)).toString();
                     gridLines.appendChild(text);
                 }
             }
-            
-            // Generate points for lines with adjusted coordinates
             const pointsLoss = this.lossHistory.map((v,i) => {
                 const x = (n===1) ? 0 : (i/(n-1))*w;
-                const y = 110 - ((v/maxVal)*h + 20); // Adjust for new coordinate system
+                const y = 110 - ((v/maxVal)*h + 20);
                 return `${x.toFixed(2)},${y.toFixed(2)}`;
             }).join(' ');
-            
             const pointsVal = this.valLossHistory.map((v,i) => {
                 const x = (n===1) ? 0 : (i/(n-1))*w;
-                const y = 110 - ((v/maxVal)*h + 20); // Adjust for new coordinate system
+                const y = 110 - ((v/maxVal)*h + 20);
                 return `${x.toFixed(2)},${y.toFixed(2)}`;
             }).join(' ');
-            
             lossLine.setAttribute('points', pointsLoss);
             valLine.setAttribute('points', pointsVal);
         } catch(e) {
@@ -167,7 +225,6 @@ export class TrainingResults {
             accuracy: document.getElementById('acc').textContent,
             params: this.tagParams.textContent
         };
-        
         const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(model, null, 2));
         const a = document.createElement('a');
         a.href = dataStr;
@@ -187,24 +244,21 @@ export class TrainingResults {
         this.lossHistory = [];
         this.valLossHistory = [];
         this.updateLossChart();
-
         if(this.tagModel) this.tagModel.textContent = '';
         if(this.tagParams) this.tagParams.textContent = '';
         if(this.tagTime) this.tagTime.textContent = '';
         if(this.tagTask) this.tagTask.textContent = '';
-    
+        // reset carousel
+        if(this.carouselTrack) this.carouselTrack.innerHTML = '';
+        this.carouselItems = [];
+        this.carouselIndex = 0;
     }
 
     formatModelName(name) {
         if (!name) return "";
-        return name
-            .split('_')
-            .map(word =>
-                word
-                    .replace(/([a-z])([A-Z])/g, "$1 $2") 
-                    .replace(/^\w/, c => c.toUpperCase())
-            )
-            .join(' ');
+        return name.split('_').map(word =>
+            word.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^\w/, c => c.toUpperCase())
+        ).join(' ');
     }
 
     updateInfo(options, time) {

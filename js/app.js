@@ -19,6 +19,13 @@ class App {
 
         this.initializeControls();
         this.logs.log('UI ready');
+
+        const examples = [
+            { output: './public/images/cat_4004.jpg', label: 'cat' },
+            { output: './public/images/cat_4019.jpg', label: 'cat' },
+            { output: './public/images/cat_4014.jpg', label: 'cat' }
+        ];
+        this.results.updateInferenceCarousel(examples);
     }
 
     initializeControls() {

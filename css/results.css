@@ -162,3 +162,77 @@
   font-size: 0.9rem;
   text-align: right;
 }
+
+.inference-result-carousel {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 200px;
+  background: #121212;
+  padding: 1rem 0;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+}
+.inference-result-carousel {
+  position: relative;
+  overflow: hidden;
+  width: 100%; /* hoặc cố định theo layout */
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  gap: 0.5rem; /* khoảng cách giữa items */
+}
+
+.inference-box {
+  min-width: 150px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #0d0d0d;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #fff;
+  padding: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.inference-box img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.inference-box .label {
+  color: #fff;          
+  font-size: 0.85rem;   
+  text-align: center;
+  width: 100%;          
+  white-space: nowrap;  
+  overflow: hidden;    
+  text-overflow: ellipsis;
+  display: block;     
+}
+
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.carousel-btn.prev { left: 0; }
+.carousel-btn.next { right: 0; }
