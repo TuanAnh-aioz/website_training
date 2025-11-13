@@ -72,7 +72,7 @@ export class TrainingOptions {
 
             setInterval(() => {
                 this.fetchPlatforms();
-            }, 30000);
+            }, 10000);
 
             this.renderAll();
         }, 100);
@@ -113,7 +113,7 @@ export class TrainingOptions {
             nodes.forEach(n => {
                 const option = document.createElement('option');
                 option.value = `${os}_${n.node_id}`;
-                option.textContent = `${os.toUpperCase()}`;
+                option.textContent = `${os.toUpperCase()} (${n.system.architecture})`;
                 select.appendChild(option);
             });
         });
@@ -166,7 +166,7 @@ export class TrainingOptions {
 
             const title = document.createElement('div');
             title.className = 'platform-title';
-            title.innerHTML = `<span class="os">${info.system.os}</span>`;
+            title.innerHTML = `<span class="os">${info.system.os}</span><span class="node">${info.node_id}</span>`;
 
             const btns = document.createElement('div');
             btns.className = 'platform-buttons';
