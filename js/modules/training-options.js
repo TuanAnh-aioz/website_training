@@ -273,8 +273,15 @@ export class TrainingOptions {
         if (type === 'optimizer') this.optimizers = [newItem];
         else this.schedulers = [newItem];
 
-        this.renderItems(containerKey, list, available);
+        this.renderItems(containerKey, type === 'optimizer' ? this.optimizers : this.schedulers, available);
+
+        const selectEl = this.elements[key];
+        selectEl.value = "";
+        const placeholderText = type === 'optimizer' ? 'Replace optimizer' : 'Replace scheduler';
+        const emptyOption = selectEl.querySelector('option[value=""]');
+        if (emptyOption) emptyOption.textContent = placeholderText;
     }
+
 
     renderItems(containerKey, items, available) {
         const container = this.elements[containerKey];
