@@ -41,7 +41,6 @@ class App {
     if (this.startBtn.textContent === "Start Training") {
       this.startBtn.textContent = "Stop Training";
       await this.submitTask();
-      this.results.reset();
       this.progress.reset();
     } else {
       this.stopTraining();

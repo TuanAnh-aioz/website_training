@@ -70,20 +70,20 @@ export class TrainingOptions {
 
       this.populateModels();
       this.populateTransforms();
-      this.populateDropdown(
+      this.populateOptSch(
         this.elements.optimizerSelect,
         AVAILABLE_OPTIMIZERS
       );
-      this.populateDropdown(
+      this.populateOptSch(
         this.elements.schedulerSelect,
         AVAILABLE_SCHEDULERS
       );
 
       this.elements.addOptimizerBtn.addEventListener("click", () =>
-        this.addSingleItem("optimizer")
+        this.addItemOptSch("optimizer")
       );
       this.elements.addSchedulerBtn.addEventListener("click", () =>
-        this.addSingleItem("scheduler")
+        this.addItemOptSch("scheduler")
       );
 
       setInterval(() => {
@@ -263,7 +263,7 @@ export class TrainingOptions {
     }
   }
 
-  populateDropdown(selectEl, data) {
+  populateOptSch(selectEl, data) {
     Object.keys(data).forEach((key) => {
       const opt = document.createElement("option");
       opt.value = key;
@@ -272,7 +272,7 @@ export class TrainingOptions {
     });
   }
 
-  addSingleItem(type) {
+  addItemOptSch(type) {
     const key = type === "optimizer" ? "optimizerSelect" : "schedulerSelect";
     const containerKey =
       type === "optimizer" ? "optimizerContainer" : "schedulerContainer";
@@ -293,7 +293,7 @@ export class TrainingOptions {
     if (type === "optimizer") this.optimizers = [newItem];
     else this.schedulers = [newItem];
 
-    this.renderItems(
+    this.renderItemsOptSch(
       containerKey,
       type === "optimizer" ? this.optimizers : this.schedulers,
       available
@@ -307,7 +307,7 @@ export class TrainingOptions {
     if (emptyOption) emptyOption.textContent = placeholderText;
   }
 
-  renderItems(containerKey, items, available) {
+  renderItemsOptSch(containerKey, items, available) {
     const container = this.elements[containerKey];
     container.innerHTML = "";
 
@@ -347,7 +347,7 @@ export class TrainingOptions {
       btnDelete.addEventListener("click", () => {
         if (containerKey === "optimizerContainer") this.optimizers = [];
         else this.schedulers = [];
-        this.renderItems(
+        this.renderItemsOptSch(
           containerKey,
           containerKey === "optimizerContainer"
             ? this.optimizers
@@ -391,12 +391,12 @@ export class TrainingOptions {
   }
 
   renderAll() {
-    this.renderItems(
+    this.renderItemsOptSch(
       "optimizerContainer",
       this.optimizers,
       AVAILABLE_OPTIMIZERS
     );
-    this.renderItems(
+    this.renderItemsOptSch(
       "schedulerContainer",
       this.schedulers,
       AVAILABLE_SCHEDULERS
@@ -600,6 +600,25 @@ export class TrainingOptions {
     return result;
   }
 
+  normalizeTransforms(data) {
+    const processItem = (item) => {
+      const newParams = {};
+      for (const [k, v] of Object.entries(item.params)) {
+        newParams[k.toLowerCase()] = v; 
+      }
+      return {
+        ...item,
+        name: item.name.toLowerCase(), 
+        params: newParams
+      };
+    };
+
+    return {
+      train: data.train.map(processItem),
+      val: data.val.map(processItem)
+    };
+  }
+
   buildTrainingConfig(options) {
     let pretrained_item = "";
     if (!!options.pretrained) {
@@ -620,7 +639,7 @@ export class TrainingOptions {
       batch_size: Number(options.batchSize) || 4,
       num_workers: options.numberWroker,
       val_ratio: options.valRatio,
-      transforms: options.transforms,
+      transforms: this.normalizeTransforms(options.transforms),
     };
 
     let optimizer = null;
