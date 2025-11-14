@@ -29,6 +29,12 @@ class App {
     if (this.startBtn) {
       this.startBtn.addEventListener("click", () => this.toggleTraining());
     }
+
+  }
+
+  localPathToURL(localPath) {
+    const filename = localPath.split("/").pop();
+    return `http://localhost:3000/images/${filename}`;
   }
 
   async toggleTraining() {
@@ -164,11 +170,21 @@ class App {
       if (data_api.success && data_api.data) {
         const resultInfo = data_api.data.result;
         const metaData = resultInfo.meta_data;
+        const examples = resultInfo.result;
 
         if (metaData && typeof metaData === "object") {
           this.results.updateSystemStats(metaData);
         }
-        // this.results.updateInferenceCarousel(resultInfo.result.examples);
+        if (examples) {
+          const examples_data = examples.examples;
+          const examplesWithURL = examples_data.map((ex) => ({
+            ...ex,
+            output: this.localPathToURL(ex.output, 3000),
+          }));
+          
+          this.results.updateInferenceCarousel(examplesWithURL);
+        }
+        
       } else {
         throw new Error(data_api.message || "Unknown API error");
       }
