@@ -40,6 +40,13 @@ class App {
         }
     }
 
+    stopTraining() {
+        this.polling = false;
+        this.startBtn.textContent = 'Start Training';
+        this.taskId = null;
+        this.logs.log('Training stopped by user');
+    }
+
     async submitTask() {
         this.clearUI();
         this.logs.clearLogs();
@@ -66,38 +73,27 @@ class App {
 
             if (!res.ok) throw new Error(`HTTP error ${res.status}`);
             const data_api = await res.json();
-            console.log(data_api);
             this.logs.log(`Task config: ${JSON.stringify(config)}`);
             
-            const data = {
-                success: true,
-                data: "linux: 994e72cf-6b9d-4068-b391-3b2d5cca59ea"
-            };
-
-            if (data.success && data.data) {
-                this.taskId = data.data.split(':')[1].trim();
+            if (data_api.success && data_api.data) {
+                const taskKey = Object.keys(data_api.data)[0];
+                this.taskId = data_api.data[taskKey]; 
                 this.logs.log(`Task submitted successfully. Task ID: ${this.taskId}`);
-                this.logOffset = 0;
+                this.logOffset = 2;
                 this.polling = true;
 
                 this.pollLogs(); 
             } else {
-                throw new Error(data.message || 'Unknown API error');
+                throw new Error(data_api.message || 'Unknown API error');
             }
         } catch (err) {
-            this.logs.log(`Error submitting task: ${err.message}`, 'red');
+            this.logs.log(`Error submitting task: ${err.message}`);
             this.startBtn.textContent = 'Start Training';
         } finally {
             this.startBtn.disabled = false;
         }
     }
 
-    stopTraining() {
-        this.polling = false;
-        this.startBtn.textContent = 'Start Training';
-        this.taskId = null;
-        this.logs.log('Training stopped by user', 'yellow');
-    }
 
     async pollLogs() {
         if (!this.taskId || !this.polling) return;
@@ -105,7 +101,7 @@ class App {
         const poll = async () => {
             if (!this.polling) return;
             try {
-                const url = `http://10.0.0.238:8083/training/task/${this.taskId}/logs?offset=${this.logOffset}&limit=10`;
+                const url = `http://10.0.0.238:8083/training/task/${this.taskId}/logs?offset=${this.logOffset}&limit=2`;
                 const res = await fetch(url, {
                     headers: {
                         'accept': 'application/json',
@@ -117,8 +113,7 @@ class App {
                 const data = await res.json();
 
                 if (data.success && data.data) {
-                    const { logs, next_offset, status } = data.data;
-
+                    const { logs, next_offset, total_lines, status } = data.data;
                     if (Array.isArray(logs)) {
                         logs.forEach(line => {
                             const text = line.trim();
@@ -131,8 +126,8 @@ class App {
                             
                             const epochRegex = /Epoch\s+(\d+)/i;
                             const trainLossRegex = /Train\s+Loss\s*=\s*([\d.]+)/i;
-                            const accuracyRegex = /'accuracy'\s*:\s*([\d.]+)/i;
-                            
+                            const accuracyRegex = /Validate\s+Accuracy\s*=\s*([\d.]+)/i;
+
                             const epochMatch = text.match(epochRegex);
                             const lossMatch = text.match(trainLossRegex);
                             const accMatch = text.match(accuracyRegex);
@@ -142,32 +137,41 @@ class App {
                                 const trainLoss = lossMatch ? parseFloat(lossMatch[1]) : null;
                                 const accuracy = accMatch ? (parseFloat(accMatch[1]) * 100).toFixed(2) : null;
 
-                                this.progress.updateProgress(epoch, trainLoss, accuracy)
-                                this.results.updateLossHistory(trainLoss)
+                                this.progress.updateProgress(epoch, trainLoss, accuracy);
+                                this.results.updateLossHistory(trainLoss);
                             }
-                            this.logs.log(text, color); 
+                            this.logs.log(text); 
                         });
 
                         const container = document.getElementById('logContainer');
                         if (container) container.scrollTop = container.scrollHeight;
                     }
 
-                    this.logOffset = next_offset || this.logOffset;
+                    this.logOffset = next_offset;
+                    const hasLogs = (() => {
+                        if (Array.isArray(logs)) return logs.length > 0;
+                        if (typeof logs === "string") return logs.trim() !== "";
+                        return false;
+                    })();
+                    const reachedEnd = next_offset === total_lines;
 
-                    if (status === 'processing' && this.polling) {
-                        setTimeout(poll, 1000); 
-                    } else {
-                        this.logs.log(`Task finished with status: ${status}`, 'yellow');
+                    if (status === "pending") {
+                        setTimeout(poll, 1000);
+                    }  
+                    else if (status === "success" && !hasLogs && reachedEnd) {
+                        this.logs.log(`Task finished with status: ${status}`);
                         this.startBtn.textContent = 'Start Training';
                         this.polling = false;
 
                         this.fetchTaskResult();
+                    } else {
+                        setTimeout(poll, 1000);
                     }
                 } else {
                     throw new Error(data.message || 'Unknown API error');
                 }
             } catch (err) {
-                this.logs.log(`Error fetching logs: ${err.message}`, 'red');
+                this.logs.log(`Error fetching logs: ${err.message}`);
                 if (this.polling) setTimeout(poll, 2000);
             }
         };
@@ -188,7 +192,7 @@ class App {
 
             if (!res.ok) throw new Error(`HTTP error ${res.status}`);
             const data = await res.json();
-            // console.log(data)
+            console.log(data)
 
             if (data.success && data.data) {
                 const data_api = data.data;           
@@ -196,13 +200,15 @@ class App {
                 const metaData = resultInfo.meta_data;  
                 console.log(resultInfo.result.examples)
 
-                this.results.updateSystemStats(metaData);
+                if (metaData && typeof metaData === "object") {
+                    this.results.updateSystemStats(metaData);
+                }
                 // this.results.updateInferenceCarousel(resultInfo.result.examples);        
             } else {
                 throw new Error(data.message || 'Unknown API error');
             }
         } catch (err) {
-            this.logs.log(`Error fetching task result: ${err.message}`, 'red');
+            this.logs.log(`Error fetching task result: ${err.message}`);
         }
     }
 
