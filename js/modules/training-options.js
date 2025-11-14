@@ -2,6 +2,7 @@ import { AVAILABLE_TRANSFORMS } from "./param/transforms.js";
 import { AVAILABLE_MODELS } from "./param/models.js";
 import { AVAILABLE_OPTIMIZERS } from "./param/optimizers.js";
 import { AVAILABLE_SCHEDULERS } from "./param/schedulers.js";
+import { getNodeTrainingAvailable } from '../api.js';
 
 export class TrainingOptions {
     constructor() {
@@ -80,19 +81,7 @@ export class TrainingOptions {
 
     async fetchPlatforms() {
         try {
-            const res = await fetch('http://10.0.0.238:8083/training/nodes/available', {
-                method: 'POST',
-                headers: {
-                    'accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'api-token': this.apiToken
-                },
-                body: ""
-            });
-
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-            const data_api = await res.json();
+            const data_api = await getNodeTrainingAvailable();
             const data = data_api.data
             console.log("Update platform support training !")
 

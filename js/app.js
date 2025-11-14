@@ -3,6 +3,7 @@ import { TrainingOptions } from './modules/training-options.js';
 import { TrainingProgress } from './modules/training-progress.js';
 import { TrainingLogs } from './modules/training-logs.js';
 import { TrainingResults } from './modules/training-results.js';
+import { createTrainingTask, getTrainingTaskLogs, getTrainingTaskResult } from './api.js';
 
 class App {
     constructor() {
@@ -14,14 +15,11 @@ class App {
         this.startBtn = document.getElementById('startBtn');
         this.taskId = null; 
         this.logOffset = 0;
-        this.apiToken = 'zxzfvsddsa';
         this.polling = false; 
         this.taskType = null
 
         this.initializeControls();
         this.logs.log('UI ready');
-        
-
     }
 
     initializeControls() {
@@ -62,18 +60,7 @@ class App {
         this.logs.log('Submitting training task to server...');
         this.progress.totalEpochs = config.epochs
         try {
-            const res = await fetch('http://10.0.0.238:8083/training/task/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'accept': 'application/json',
-                    'api-token': this.apiToken
-                },
-                body: JSON.stringify(config)
-            });
-
-            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-            const data_api = await res.json();
+            const data_api = await createTrainingTask(config);
             this.logs.log(`Task config: ${JSON.stringify(config)}`);
             
             if (data_api.success && data_api.data) {
@@ -102,29 +89,15 @@ class App {
         const poll = async () => {
             if (!this.polling) return;
             try {
-                const url = `http://10.0.0.238:8083/training/task/${this.taskId}/logs?offset=${this.logOffset}&limit=2`;
-                const res = await fetch(url, {
-                    headers: {
-                        'accept': 'application/json',
-                        'api-token': this.apiToken
-                    }
-                });
+                const data_api = await getTrainingTaskLogs(this.taskId, this.logOffset);
 
-                if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-                const data = await res.json();
-
-                if (data.success && data.data) {
-                    const { logs, next_offset, total_lines, status } = data.data;
+                if (data_api.success && data_api.data) {
+                    const { logs, next_offset, total_lines, status } = data_api.data;
                     if (Array.isArray(logs)) {
                         logs.forEach(line => {
                             const text = line.trim();
                             if (!text) return;
 
-                            let color = 'white';
-                            if (text.includes('WARNING')) color = 'orange';
-                            else if (text.includes('ERROR')) color = 'red';
-                            else if (text.includes('INFO')) color = '#7fbfff';
-                            
                             const epochRegex = /Epoch\s+(\d+)/i;
                             const trainLossRegex = /Train\s+Loss\s*=\s*([\d.]+)/i;
                             const accuracyRegex = /Validate\s+Accuracy\s*=\s*([\d.]+)/i;
@@ -169,7 +142,7 @@ class App {
                         setTimeout(poll, 1000);
                     }
                 } else {
-                    throw new Error(data.message || 'Unknown API error');
+                    throw new Error(data_api.message || 'Unknown API error');
                 }
             } catch (err) {
                 this.logs.log(`Error fetching logs: ${err.message}`);
@@ -184,29 +157,17 @@ class App {
         if (!this.taskId) return;
 
         try {
-            const res = await fetch(`http://10.0.0.238:8083/training/task/info/${this.taskId}`, {
-                headers: {
-                    'accept': 'application/json',
-                    'api-token': this.apiToken
-                }
-            });
-
-            if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-            const data = await res.json();
-            console.log(data)
-
-            if (data.success && data.data) {
-                const data_api = data.data;           
-                const resultInfo = data_api.result;   
+            const data_api = await getTrainingTaskResult(this.taskId);
+            if (data.success && data_api.data) {
+                const resultInfo = data_api.data.result;   
                 const metaData = resultInfo.meta_data;  
-                console.log(resultInfo.result.examples)
 
                 if (metaData && typeof metaData === "object") {
                     this.results.updateSystemStats(metaData);
                 }
                 // this.results.updateInferenceCarousel(resultInfo.result.examples);        
             } else {
-                throw new Error(data.message || 'Unknown API error');
+                throw new Error(data_api.message || 'Unknown API error');
             }
         } catch (err) {
             this.logs.log(`Error fetching task result: ${err.message}`);
