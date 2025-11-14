@@ -261,21 +261,40 @@ export class TrainingResults {
         const gpuInfo = document.getElementById('gpu-info');
         const processingTime = document.getElementById('processing-time');
 
-        const ramUsageGB = (meta_data.resource.system_ram.usage / 1e9).toFixed(2);
-        const ramTotalGB = (meta_data.resource.system_ram.total / 1e9).toFixed(2);
-        const gpuUsageGB = (meta_data.resource.gpu_memory.usage / 1e9).toFixed(2);
-        const gpuTotalGB = (meta_data.resource.gpu_memory.total / 1e9).toFixed(2);
+        if (!meta_data || Array.isArray(meta_data) && meta_data.length === 0) {
+            ramFill.style.width = '0%';
+            gpuFill.style.width = '0%';
 
-        const ramPercent = (meta_data.resource.system_ram.usage / meta_data.resource.system_ram.total) * 100;
-        const gpuPercent = (meta_data.resource.gpu_memory.usage / meta_data.resource.gpu_memory.total) * 100;
+            ramInfo.textContent = `0.00 / 0.00 GB`;
+            gpuInfo.textContent = `0.00 / 0.00 GB`;
+            processingTime.textContent = `0.00 s`;
 
+            return; 
+        }
+
+        const sys = meta_data.resource?.system_ram || { usage: 0, total: 1 };
+        const gpu = meta_data.resource?.gpu_memory || { usage: 0, total: 1 };
+
+        const ramUsageGB = (sys.usage / 1e9).toFixed(2);
+        const ramTotalGB = (sys.total / 1e9).toFixed(2);
+        const gpuUsageGB = (gpu.usage / 1e9).toFixed(2);
+        const gpuTotalGB = (gpu.total / 1e9).toFixed(2);
+
+        const ramPercent = (sys.usage / sys.total) * 100;
+        const gpuPercent = (gpu.usage / gpu.total) * 100;
+
+        // Update bars
         ramFill.style.width = `${ramPercent}%`;
         gpuFill.style.width = `${gpuPercent}%`;
 
+        // Update text
         ramInfo.textContent = `${ramUsageGB} / ${ramTotalGB} GB`;
         gpuInfo.textContent = `${gpuUsageGB} / ${gpuTotalGB} GB`;
-        processingTime.textContent = `${meta_data.processing_time.toFixed(2)} s`;
+
+        const ptime = meta_data.processing_time || 0;
+        processingTime.textContent = `${ptime.toFixed ? ptime.toFixed(2) : '0.00'} s`;
     }
+
 
 
     updateEpoch(epoch) {
@@ -423,6 +442,7 @@ export class TrainingResults {
         if(this.carouselTrack) this.carouselTrack.innerHTML = '';
         this.carouselItems = [];
         this.carouselIndex = 0;
+        this.updateSystemStats([])
     }
 
     formatModelName(name) {

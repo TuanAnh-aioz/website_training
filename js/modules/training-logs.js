@@ -36,14 +36,16 @@ export class TrainingLogs {
                         String(now.getMinutes()).padStart(2, '0') + ':' +
                         String(now.getSeconds()).padStart(2, '0');
 
-        const match = text.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}),\d+\s+(?:aioz_trainer\.[\w\.]+)\s+(\w+)\s+-\s+(.*)$/);
+        const match = text.match(
+            /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d+)\s+([\w\.]+)\s+(\w+)\s+-\s+(.*)$/
+        );
 
         let level = "INFO";
         let message = text;
 
         if (match) {
-            level = match[2];
-            message = match[3];
+            level = match[3];  
+            message = match[4];
         }
 
         li.innerHTML = `
