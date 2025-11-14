@@ -23,11 +23,25 @@
   <div class="form-group two-col">
     <div>
       <label for="valRatio">Val Ratio</label>
-      <input id="valRatio" type="number" step="0.01" min="0" max="1" value="0.0">
+      <input
+        id="valRatio"
+        type="number"
+        step="0.01"
+        min="0"
+        max="1"
+        value="0.0"
+      />
     </div>
     <div>
       <label for="numberWroker">Number Worker</label>
-      <input id="numberWroker" type="number" step="1" min="0" max="10" value="0">
+      <input
+        id="numberWroker"
+        type="number"
+        step="1"
+        min="0"
+        max="10"
+        value="0"
+      />
     </div>
   </div>
 
@@ -47,46 +61,52 @@
       </select>
       <button id="addTransform" type="button" class="btn-add">+</button>
     </div>
-
   </div>
 
   <div class="form-group">
     <label for="modelSelect">Model</label>
     <select id="modelSelect"></select>
   </div>
-  <div class="form-group" id="threshold-group" style="display:none;">
+  <div class="form-group" id="threshold-group" style="display: none">
     <label for="threshold">Threshold</label>
-    <input id="threshold" type="number" step="0.01" min="0" max="1" value="0.0">
+    <input
+      id="threshold"
+      type="number"
+      step="0.01"
+      min="0"
+      max="1"
+      value="0.0"
+    />
   </div>
 
   <div class="form-group">
-      <label for="optimizerSelect">Optimizer</label>
+    <label for="optimizerSelect">Optimizer</label>
 
-      <div id="optimizerContainer" class="optimizer-container">
-          <p class="no-optimizer">No optimizer added.</p>
-      </div>
+    <div id="optimizerContainer" class="optimizer-container">
+      <p class="no-optimizer">No optimizer added.</p>
+    </div>
 
-      <div class="optimizer-add mt-4 flex gap-2">
-          <select id="optimizerSelect" class="optimizer-select">
-            <option value="">Select an optimizer ...</option>
-          </select>
-          <button id="addOptimizer" type="button" class="btn-add">+</button>
-      </div>
+    <div class="optimizer-add mt-4 flex gap-2">
+      <select id="optimizerSelect" class="optimizer-select">
+        <option value="">Select an optimizer ...</option>
+      </select>
+      <button id="addOptimizer" type="button" class="btn-add">+</button>
+    </div>
   </div>
 
   <div class="form-group">
-      <label for="schedulerSelect">Scheduler</label>
+    <label for="schedulerSelect">Scheduler</label>
 
-      <div id="schedulerContainer" class="scheduler-container">
-          <p class="no-scheduler">No scheduler added.</p>
-      </div>
+    <div id="schedulerContainer" class="scheduler-container">
+      <p class="no-scheduler">No scheduler added.</p>
+    </div>
 
-      <div class="scheduler-add mt-4 flex gap-2">
-          <select id="schedulerSelect" class="scheduler-select">
-            <option value="">Select an scheduler ...</option>
-          </select>
-          <button id="addScheduler" type="button" class="btn-add">+</button>
-      </div>
+    <div class="scheduler-add mt-4 flex gap-2">
+      <select id="schedulerSelect" class="scheduler-select">
+        <option value="">Select an scheduler ...</option>
+      </select>
+      <button id="addScheduler" type="button" class="btn-add">+</button>
+    </div>
   </div>
 
   <div class="form-group">
@@ -103,22 +123,22 @@
   <div class="form-group two-col">
     <div>
       <label for="learningRate">Learning Rate</label>
-      <input id="learningRate" type="text" value="0.0">
+      <input id="learningRate" type="text" value="0.0" />
     </div>
     <div>
       <label for="batchSize">Batch Size</label>
-      <input id="batchSize" type="text" value="0">
+      <input id="batchSize" type="text" value="0" />
     </div>
   </div>
 
   <div class="form-group two-col">
     <div>
       <label for="epochs">Epochs</label>
-        <input id="epochs" type="number" min="1" value="0">
+      <input id="epochs" type="number" min="1" value="0" />
     </div>
     <div class="checkbox-row">
       <label for="pretrained">Pretrained</label>
-      <input id="pretrained" type="checkbox" checked>
+      <input id="pretrained" type="checkbox" checked />
     </div>
   </div>
 

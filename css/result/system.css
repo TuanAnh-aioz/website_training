@@ -1,0 +1,103 @@
+.inference-meta {
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 100%;
+  max-width: 400px;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  margin-top: 1rem;
+}
+
+.meta-header {
+  font-family: 'Arial', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600; 
+  color: #fff;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  position: relative;
+  display: flex;
+  border-bottom: 1px solid #333;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.meta-header::after {
+  bottom: -10px;
+  width: 60%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.4);
+  left: 0;
+  border-radius: 1px;
+}
+
+.meta-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: center;
+  padding-bottom: 1rem;
+}
+
+.meta-card {
+  background: #262626;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 250px;
+  box-sizing: border-box;
+}
+
+.meta-title {
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+  color: #bbb;
+}
+
+.meta-bar {
+  position: relative;
+  height: 6px;
+  background: #444;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.meta-fill {
+  height: 100%;
+  width: 0;
+  transition: width 0.8s ease;
+  border-radius: 4px;
+}
+
+.meta-fill.ram {
+  background: linear-gradient(90deg, #6fc3df, #007acc);
+}
+
+.meta-fill.gpu {
+  background: linear-gradient(90deg, #fcd34d, #f59e0b);
+}
+
+.meta-info,
+.meta-value {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.meta-header {
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 1px solid #333;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-content {
+  padding: 1rem;
+}

@@ -1,0 +1,121 @@
+.logs {
+  background: var(--card);
+  padding: 16px;
+  border-radius: 12px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.logs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.logs-header h3 {
+  margin: 0;
+  color: #cfe7ff;
+  font-size: 18px;
+}
+
+.log-list {
+  flex: 1 1 auto;
+  list-style: none;
+  padding: 8px;
+  margin: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #0b0f16;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 13px;
+  color: #cfe7ff;
+  scrollbar-width: thin;
+  scrollbar-color: #3b82f6 #111;
+}
+
+.log-list::-webkit-scrollbar {
+  width: 8px;
+}
+.log-list::-webkit-scrollbar-track {
+  background: #111;
+  border-radius: 4px;
+}
+.log-list::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 4px;
+}
+.log-list::-webkit-scrollbar-thumb:hover {
+  background: #60a5fa;
+}
+
+.log-list li {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.log-time {
+  color: #6c9eff;
+  flex-shrink: 0;
+}
+.log-level {
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.log-info {
+  background: rgba(0, 150, 255, 0.15);
+  color: #00aaff;
+}
+.log-warning {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+}
+.log-error {
+  background: rgba(255, 50, 50, 0.15);
+  color: #ff5555;
+}
+.log-debug {
+  background: rgba(150, 150, 150, 0.15);
+  color: #aaa;
+}
+
+.log-text {
+  flex: 1;
+  color: #e4ecf7;
+}
+
+.tiny {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: #bfe6ff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tiny svg {
+  display: block;
+}
+
+.tiny:hover {
+  background: rgba(255, 255, 255, 0.02);
+}

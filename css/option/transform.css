@@ -1,42 +1,47 @@
-
 .transform-item {
-    background-color: #374151; 
-    border-radius: 0.5rem;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    display: flex;
-    flex-direction: column; 
+  background-color: #374151;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .transform-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: nowrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 
 .transform-header span {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
 }
+
 .transform-buttons {
-    display: flex;
-    gap: 0.25rem;
+  display: flex;
+  gap: 0.25rem;
 }
 
 .transform-buttons button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #fff;
-    font-size: 0.875rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
 }
-.transform-buttons .btn-settings:hover { color: #3b82f6; }
-.transform-buttons .btn-delete:hover { color: #ef4444; }
 
+.transform-buttons .btn-settings:hover {
+  color: #3b82f6;
+}
+
+.transform-buttons .btn-delete:hover {
+  color: #ef4444;
+}
 
 .param-group {
   margin-top: 6px;
@@ -81,12 +86,12 @@
 }
 
 .btn-mode {
-    padding: 6px 12px;
-    border-radius: 6px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.06);
-    color: #bfe6ff;
-    cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #bfe6ff;
+  cursor: pointer;
 }
 
 .btn-mode.active {
@@ -118,8 +123,8 @@
   cursor: pointer;
 }
 
-
-.btn-settings, .btn-delete {
+.btn-settings,
+.btn-delete {
   background: none;
   border: none;
   cursor: pointer;
@@ -131,16 +136,18 @@
 
 .btn-settings:hover {
   color: #3b82f6;
-  background: rgba(59,130,246,0.1);
+  background: rgba(59, 130, 246, 0.1);
 }
 
 .btn-delete:hover {
   color: #ef4444;
-  background: rgba(239,68,68,0.1);
+  background: rgba(239, 68, 68, 0.1);
 }
 
-.btn-settings svg, .btn-delete svg,
-.btn-settings i, .btn-delete i {
+.btn-settings svg,
+.btn-delete svg,
+.btn-settings i,
+.btn-delete i {
   width: 16px;
   height: 16px;
   pointer-events: none;

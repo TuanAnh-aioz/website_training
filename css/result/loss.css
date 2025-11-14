@@ -1,0 +1,43 @@
+
+.result-card-loss {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.8rem;
+}
+
+.loss-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5rem;
+}
+
+.loss-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#lossSvg {
+  width: 100%;
+  max-width: 260px;
+  height: 140px;
+}
+
+#lossSvg line {
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 1;
+}
+
+.axis-label {
+  font-size: 0.7rem;
+  fill: #fff;
+}

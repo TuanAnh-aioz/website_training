@@ -1,0 +1,101 @@
+.inference-result-carousel {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 150px;
+  background: #121212;
+  padding: 0.5rem 0;
+  border-radius: 8px;
+}
+
+.infer-header {
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-bottom: 1px solid #333;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+
+.inference-box {
+  min-width: 160px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #fff;
+  padding: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inference-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+}
+
+.inference-box img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.inference-box .label {
+  color: #fff;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: #fff;
+  font-size: 1.6rem;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+}
+
+.carousel-btn:hover {
+  background: rgba(56, 189, 248, 0.8);
+}
+
+.carousel-btn.prev {
+  left: 0.5rem;
+}
+.carousel-btn.next {
+  right: 0.5rem;
+}
+
+.infer-content {
+  padding: 1rem;
+}
+
+.inference-result {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  min-height: 150px;
+}

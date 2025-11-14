@@ -1,0 +1,164 @@
+.platform-container {
+  margin-top: 10px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #2d3748;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.platform-item {
+  background-color: #374151;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.platform-item.active {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.platform-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #4b5563;
+  margin-bottom: 4px;
+}
+
+.platform-header .platform-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.platform-title .os {
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: #e6eef8;
+}
+
+.platform-title .node {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.platform-title span {
+  font-weight: 600;
+  color: #fff;
+  margin-right: 8px;
+}
+
+.platform-buttons {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.platform-buttons button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.platform-buttons .btn-settings:hover {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.platform-buttons .btn-remove:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.platform-details {
+  display: none;
+  padding-top: 8px;
+  font-size: 13px;
+  color: #d1d5db;
+}
+
+.platform-details.show {
+  display: block;
+}
+
+.platform-info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.platform-info-list li {
+  min-width: 140px;
+  color: #cbd5e1;
+}
+
+.transform-add .transform-select {
+  flex: 1;
+}
+
+#platformPreview {
+  max-height: 160px;
+  overflow: auto;
+}
+
+.no-platform {
+  color: #9ca3af;
+  font-size: 12px;
+  text-align: center;
+}
+
+.platform-info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.platform-info-row span {
+  display: inline-block;
+}
+
+.platform-gpu {
+  margin-left: 12px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.btn-settings,
+.btn-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  color: #9ca3af;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.btn-settings:hover {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.btn-remove:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
