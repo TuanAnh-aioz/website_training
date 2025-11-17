@@ -84,7 +84,7 @@ export const AVAILABLE_MODELS = {
     densenet161: {
       label: "DenseNet161",
       weight:
-        "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/classification/pretrained/densenet169-b2777c0a.pth",
+        "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/classification/pretrained/densenet161.pth",
     },
     densenet169: {
       label: "DenseNet169",
@@ -94,7 +94,7 @@ export const AVAILABLE_MODELS = {
     densenet201: {
       label: "DenseNet201",
       weight:
-        "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/classification/pretrained/densenet169-b2777c0a.pth",
+        "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/classification/pretrained/densenet201.pth",
     },
     googlenet: {
       label: "GoogLeNet",
