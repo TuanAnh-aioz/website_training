@@ -5,6 +5,7 @@ export class TrainingResults {
     this.tagTask = document.getElementById("tagTask");
     this.tagModel = document.getElementById("tagModel");
     this.tagParams = document.getElementById("tagParams");
+    this.weightData = null;
 
     this.lossHistory = [];
 
@@ -382,9 +383,6 @@ export class TrainingResults {
     const maxLoss = Math.max(...data);
     const range = maxLoss - minLoss || 1;
 
-    // -------------------------------
-    // CREATE LAYERS
-    // -------------------------------
     const gridLayer = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "g"
@@ -407,9 +405,6 @@ export class TrainingResults {
     svg.appendChild(lineLayer);
     svg.appendChild(axisLayer);
 
-    // -------------------------------
-    // GRID + AXIS
-    // -------------------------------
     const ySteps = 5;
     for (let i = 0; i <= ySteps; i++) {
       const y = padding.top + (innerH * i) / ySteps;
@@ -444,9 +439,6 @@ export class TrainingResults {
     xAxis.setAttribute("stroke", "rgba(255,255,255,0.25)");
     axisLayer.appendChild(xAxis);
 
-    // -------------------------------
-    // COMPUTE SMOOTH POINTS
-    // -------------------------------
     const pts = data.map((v, i) => {
       const x = padding.left + (i / (n - 1)) * innerW;
       const y = padding.top + ((maxLoss - v) / range) * innerH;
@@ -470,12 +462,7 @@ export class TrainingResults {
     };
 
     const pathD = buildCurve(pts);
-
-    // -------------------------------
-    // GRADIENT FILL
-    // -------------------------------
     const defs = document.createElementNS(svg.namespaceURI, "defs");
-
     const grad = document.createElementNS(svg.namespaceURI, "linearGradient");
     grad.setAttribute("id", "lossFill");
     grad.setAttribute("x1", "0");
@@ -509,9 +496,6 @@ export class TrainingResults {
     fillPath.setAttribute("fill", "url(#lossFill)");
     fillLayer.appendChild(fillPath);
 
-    // -------------------------------
-    // LOSS LINE
-    // -------------------------------
     const line = document.createElementNS(svg.namespaceURI, "path");
     line.setAttribute("d", pathD);
     line.setAttribute("stroke", "#38bdf8");
@@ -534,7 +518,9 @@ export class TrainingResults {
         : 5,
       accuracy: document.getElementById("acc").textContent,
       params: this.tagParams.textContent,
+      weight: this.weightData
     };
+
     const dataStr =
       "data:text/json;charset=utf-8," +
       encodeURIComponent(JSON.stringify(model, null, 2));
@@ -577,5 +563,11 @@ export class TrainingResults {
     if (this.tagParams) this.tagParams.textContent = String(options.params);
     if (this.tagTask)
       this.tagTask.textContent = this.formatModelName(options.task);
+  }
+
+  updateWeightInfo(weight_meta) {
+    if (!this.weightData) {
+      this.weightData = weight_meta;
+    }
   }
 }

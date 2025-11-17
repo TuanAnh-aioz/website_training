@@ -639,6 +639,7 @@ export class TrainingOptions {
       classification: "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/classification/metadata.csv",
       detection: "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/detection/metadata.csv",
     }[options.task] ?? "";
+    
     const dataset = {
       csv_file: data_csv,
       name: options.dataset,

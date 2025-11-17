@@ -29,7 +29,6 @@ class App {
     if (this.startBtn) {
       this.startBtn.addEventListener("click", () => this.toggleTraining());
     }
-
   }
 
   localPathToURL(localPath) {
@@ -86,7 +85,6 @@ class App {
       // this.polling = true;
       // this.taskId = "1f6be816-9fb3-40f2-80d2-e3170266b9e1"
       // this.pollLogs();
-
     } catch (err) {
       this.logs.log(`Error submitting task: ${err.message}`);
       this.startBtn.textContent = "Start Training";
@@ -146,7 +144,6 @@ class App {
           if (status === "pending") {
             setTimeout(poll, 1000);
           } else if (status === "success" && !hasLogs && reachedEnd) {
-            // this.logs.log(`Task finished with status: ${status}`);
             this.startBtn.textContent = "Start Training";
             this.polling = false;
 
@@ -173,22 +170,25 @@ class App {
       const data_api = await getTrainingTaskResult(this.taskId);
       if (data_api.success && data_api.data) {
         const resultInfo = data_api.data.result;
+        
         const metaData = resultInfo.meta_data;
-        const examples = resultInfo.result;
-
         if (metaData && typeof metaData === "object") {
           this.results.updateSystemStats(metaData);
         }
-        if (examples) {
-          const examples_data = examples.examples;
-          const examplesWithURL = examples_data.map((ex) => ({
+
+        const examplesData = resultInfo.result.examples;
+        if (examplesData) {
+          const examplesWithURL = examplesData.map((ex) => ({
             ...ex,
             output: this.localPathToURL(ex.output, 3000),
           }));
-          
+
           this.results.updateInferenceCarousel(examplesWithURL);
         }
-        
+        const metaWeight = resultInfo.result.weights;
+        if (metaWeight) {
+          this.results.updateWeightInfo(metaWeight);
+        }
       } else {
         throw new Error(data_api.message || "Unknown API error");
       }
