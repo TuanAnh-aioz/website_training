@@ -68,9 +68,9 @@ class App {
     this.logs.log("Submitting training task to server...");
     this.progress.totalEpochs = config.epochs;
     try {
-      const data_api = await createTrainingTask(config);
       // this.logs.log(`Task config: ${JSON.stringify(config)}`);
 
+      const data_api = await createTrainingTask(config);
       if (data_api.success && data_api.data) {
         const taskKey = Object.keys(data_api.data)[0];
         this.taskId = data_api.data[taskKey];

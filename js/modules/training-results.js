@@ -7,7 +7,6 @@ export class TrainingResults {
     this.tagParams = document.getElementById("tagParams");
 
     this.lossHistory = [];
-    this.valLossHistory = [];
 
     this.carouselSelector = ".inference-result-carousel";
     this.carouselTrack = null;
@@ -351,87 +350,50 @@ export class TrainingResults {
 
   updateLossChart() {
     const svg = document.getElementById("lossSvg");
-    const lossLine = document.getElementById("lossLine");
-    if (!svg || !lossLine) return;
+    if (!svg) return;
 
-    const w = 200;
-    const h = 90;
-    const paddingTop = 20;
-    const paddingBottom = 20;
-    const paddingLeft = 40;
-    const paddingRight = 20;
-
-    const n = Math.max(this.lossHistory.length, 1);
-    const maxVal = Math.max(1, Math.max(...this.lossHistory));
-
-    const gridLines = svg.querySelector(".grid-lines");
-    gridLines.innerHTML = "";
-
-    const ySteps = 5;
-    for (let i = 0; i <= ySteps; i++) {
-      const y = paddingTop + (h * (ySteps - i)) / ySteps;
-      const line = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "line"
-      );
-      line.setAttribute("x1", paddingLeft);
-      line.setAttribute("y1", y);
-      line.setAttribute("x2", w + paddingLeft);
-      line.setAttribute("y2", y);
-      line.setAttribute("stroke", "rgba(255,255,255,0.2)");
-      gridLines.appendChild(line);
-
-      if (i > 0) {
-        const text = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "text"
-        );
-        text.setAttribute("x", paddingLeft - 4);
-        text.setAttribute("y", y + 4);
-        text.setAttribute("text-anchor", "end");
-        text.setAttribute("class", "axis-label");
-        text.textContent = ((maxVal * i) / ySteps).toFixed(2);
-        gridLines.appendChild(text);
-      }
+    if (this.lossHistory.length === 0) {
+      const path = svg.querySelector("path");
+      if (path) path.remove();
+      return;
     }
 
-    const xSteps = Math.min(n, 8);
-    for (let i = 0; i <= xSteps; i++) {
-      const x = paddingLeft + (w * i) / xSteps;
-      const line = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "line"
-      );
-      line.setAttribute("x1", x);
-      line.setAttribute("y1", paddingTop);
-      line.setAttribute("x2", x);
-      line.setAttribute("y2", h + paddingTop);
-      line.setAttribute("stroke", "rgba(255,255,255,0.2)");
-      gridLines.appendChild(line);
+    const w = svg.clientWidth || 400;
+    const h = svg.clientHeight || 150;
+    const padding = 30;
 
-      if (i > 0) {
-        const text = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "text"
-        );
-        text.setAttribute("x", x);
-        text.setAttribute("y", h + paddingTop + 14);
-        text.setAttribute("text-anchor", "middle");
-        text.setAttribute("class", "axis-label");
-        text.textContent = Math.round((i * (n - 1)) / xSteps).toString();
-        gridLines.appendChild(text);
-      }
-    }
+    const n = this.lossHistory.length;
+    if (n === 0) return;
 
-    const pointsLoss = this.lossHistory
-      .map((v, i) => {
-        const x = paddingLeft + (n === 1 ? 0 : (i / (n - 1)) * w);
-        const y = paddingTop + h - (v / maxVal) * h;
-        return `${x},${y}`;
+    const minLoss = Math.min(...this.lossHistory);
+    const maxLoss = Math.max(...this.lossHistory);
+
+    const points = this.lossHistory.map((v, i) => {
+      const x = padding + (i / (n - 1)) * (w - 2 * padding);
+      const y =
+        h - padding - ((v - minLoss) / (maxLoss - minLoss)) * (h - 2 * padding);
+      return [x, y];
+    });
+
+    const d = points
+      .map(([x, y], i) => {
+        if (i === 0) return `M${x},${y}`;
+        const [x0, y0] = points[i - 1];
+        const cx = (x0 + x) / 2;
+        return `C${cx},${y0} ${cx},${y} ${x},${y}`;
       })
       .join(" ");
 
-    lossLine.setAttribute("points", pointsLoss);
+    let path = svg.querySelector("path");
+    if (!path) {
+      path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("stroke", "#38bdf8");
+      path.setAttribute("stroke-width", "2");
+      path.setAttribute("fill", "none");
+      svg.appendChild(path);
+    }
+
+    path.setAttribute("d", d);
   }
 
   downloadModel() {
@@ -460,7 +422,6 @@ export class TrainingResults {
 
   reset() {
     this.lossHistory = [];
-    this.valLossHistory = [];
     this.updateLossChart();
     if (this.tagModel) this.tagModel.textContent = "";
     if (this.tagParams) this.tagParams.textContent = "";
@@ -470,6 +431,7 @@ export class TrainingResults {
     this.carouselItems = [];
     this.carouselIndex = 0;
     this.updateSystemStats([]);
+    this.updateInfo();
   }
 
   formatModelName(name) {
