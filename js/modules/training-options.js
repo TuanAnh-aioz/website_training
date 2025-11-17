@@ -70,14 +70,8 @@ export class TrainingOptions {
 
       this.populateModels();
       this.populateTransforms();
-      this.populateOptSch(
-        this.elements.optimizerSelect,
-        AVAILABLE_OPTIMIZERS
-      );
-      this.populateOptSch(
-        this.elements.schedulerSelect,
-        AVAILABLE_SCHEDULERS
-      );
+      this.populateOptSch(this.elements.optimizerSelect, AVAILABLE_OPTIMIZERS);
+      this.populateOptSch(this.elements.schedulerSelect, AVAILABLE_SCHEDULERS);
 
       this.elements.addOptimizerBtn.addEventListener("click", () =>
         this.addItemOptSch("optimizer")
@@ -136,7 +130,7 @@ export class TrainingOptions {
   addSelectedPlatform(platformKey) {
     if (!platformKey) return;
 
-    if (this.selectedPlatforms.some((p) => p.key === platformKey)) return; 
+    if (this.selectedPlatforms.some((p) => p.key === platformKey)) return;
 
     const [os, node_id] = platformKey.split("_");
     const platformInfo = this.platformsData[os]?.find(
@@ -604,32 +598,41 @@ export class TrainingOptions {
     const processItem = (item) => {
       const newParams = {};
       for (const [k, v] of Object.entries(item.params)) {
-        newParams[k.toLowerCase()] = v; 
+        newParams[k.toLowerCase()] = v;
       }
       return {
         ...item,
-        name: item.name.toLowerCase(), 
-        params: newParams
+        name: item.name.toLowerCase(),
+        params: newParams,
       };
     };
 
     return {
       train: data.train.map(processItem),
-      val: data.val.map(processItem)
+      val: data.val.map(processItem),
     };
   }
 
   buildTrainingConfig(options) {
-    let pretrained_item = "";
+    const pretrained_item = "";
     if (!!options.pretrained) {
-      pretrained_item =
-        "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/classification/pretrained/resnet18-f37072fd.pth";
+      pretrained_item = options.pretrained
+        ? AVAILABLE_MODELS?.[options.task]?.[options.model]?.weight ?? ""
+        : "";
     }
+
+    const num_item = 0;
+    if (options.task == "classification") {
+      num_item = 2;
+    } else {
+      num_item = 3;
+    }
+
     const model = {
       name: options.model,
       pretrained: pretrained_item,
       resume: "",
-      num_classes: 2,
+      num_classes: num_item,
     };
 
     const dataset = {
