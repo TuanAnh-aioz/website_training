@@ -77,8 +77,6 @@ class App {
         this.logs.log(`Task submitted successfully. Task ID: ${this.taskId}`);
         this.logOffset = 2;
         this.polling = true;
-
-        this.taskId = "7cc85db3-493c-44cb-80ab-64ae7bae8c09"
         this.pollLogs();
       } else {
         throw new Error(data_api.message || "Unknown API error");
