@@ -352,6 +352,8 @@ export class TrainingResults {
     const svg = document.getElementById("lossSvg");
     if (!svg) return;
 
+    svg.innerHTML = ""; // reset
+
     if (this.lossHistory.length === 0) {
       const path = svg.querySelector("path");
       if (path) path.remove();
@@ -360,40 +362,164 @@ export class TrainingResults {
 
     const w = svg.clientWidth || 400;
     const h = svg.clientHeight || 150;
-    const padding = 30;
 
-    const n = this.lossHistory.length;
-    if (n === 0) return;
+    const padding = {
+      left: 45,
+      right: 15,
+      top: 20,
+      bottom: 30,
+    };
 
-    const minLoss = Math.min(...this.lossHistory);
-    const maxLoss = Math.max(...this.lossHistory);
+    const innerW = w - padding.left - padding.right;
+    const innerH = h - padding.top - padding.bottom;
 
-    const points = this.lossHistory.map((v, i) => {
-      const x = padding + (i / (n - 1)) * (w - 2 * padding);
-      const y =
-        h - padding - ((v - minLoss) / (maxLoss - minLoss)) * (h - 2 * padding);
+    if (this.lossHistory.length === 0) return;
+
+    const data = this.lossHistory;
+    const n = data.length;
+
+    const minLoss = Math.min(...data);
+    const maxLoss = Math.max(...data);
+    const range = maxLoss - minLoss || 1;
+
+    // -------------------------------
+    // CREATE LAYERS
+    // -------------------------------
+    const gridLayer = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "g"
+    );
+    const axisLayer = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "g"
+    );
+    const lineLayer = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "g"
+    );
+    const fillLayer = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "g"
+    );
+
+    svg.appendChild(gridLayer);
+    svg.appendChild(fillLayer);
+    svg.appendChild(lineLayer);
+    svg.appendChild(axisLayer);
+
+    // -------------------------------
+    // GRID + AXIS
+    // -------------------------------
+    const ySteps = 5;
+    for (let i = 0; i <= ySteps; i++) {
+      const y = padding.top + (innerH * i) / ySteps;
+
+      // grid line
+      const line = document.createElementNS(svg.namespaceURI, "line");
+      line.setAttribute("x1", padding.left);
+      line.setAttribute("x2", w - padding.right);
+      line.setAttribute("y1", y);
+      line.setAttribute("y2", y);
+      line.setAttribute("stroke", "rgba(255,255,255,0.08)");
+      gridLayer.appendChild(line);
+
+      // label
+      const label = document.createElementNS(svg.namespaceURI, "text");
+      label.setAttribute("x", padding.left - 8);
+      label.setAttribute("y", y + 4);
+      label.setAttribute("text-anchor", "end");
+      label.setAttribute("fill", "#aaa");
+      label.setAttribute("font-size", "10");
+      const value = maxLoss - (range * i) / ySteps;
+      label.textContent = value.toFixed(3);
+      axisLayer.appendChild(label);
+    }
+
+    // X axis line
+    const xAxis = document.createElementNS(svg.namespaceURI, "line");
+    xAxis.setAttribute("x1", padding.left);
+    xAxis.setAttribute("x2", w - padding.right);
+    xAxis.setAttribute("y1", h - padding.bottom);
+    xAxis.setAttribute("y2", h - padding.bottom);
+    xAxis.setAttribute("stroke", "rgba(255,255,255,0.25)");
+    axisLayer.appendChild(xAxis);
+
+    // -------------------------------
+    // COMPUTE SMOOTH POINTS
+    // -------------------------------
+    const pts = data.map((v, i) => {
+      const x = padding.left + (i / (n - 1)) * innerW;
+      const y = padding.top + ((maxLoss - v) / range) * innerH;
       return [x, y];
     });
 
-    const d = points
-      .map(([x, y], i) => {
-        if (i === 0) return `M${x},${y}`;
-        const [x0, y0] = points[i - 1];
-        const cx = (x0 + x) / 2;
-        return `C${cx},${y0} ${cx},${y} ${x},${y}`;
-      })
-      .join(" ");
+    // Spline curve builder
+    const buildCurve = (pts) => {
+      let d = "";
+      for (let i = 0; i < pts.length; i++) {
+        const [x, y] = pts[i];
+        if (i === 0) {
+          d += `M${x},${y}`;
+        } else {
+          const [x0, y0] = pts[i - 1];
+          const cx = (x0 + x) / 2;
+          d += ` C${cx},${y0} ${cx},${y} ${x},${y}`;
+        }
+      }
+      return d;
+    };
 
-    let path = svg.querySelector("path");
-    if (!path) {
-      path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("stroke", "#38bdf8");
-      path.setAttribute("stroke-width", "2");
-      path.setAttribute("fill", "none");
-      svg.appendChild(path);
-    }
+    const pathD = buildCurve(pts);
 
-    path.setAttribute("d", d);
+    // -------------------------------
+    // GRADIENT FILL
+    // -------------------------------
+    const defs = document.createElementNS(svg.namespaceURI, "defs");
+
+    const grad = document.createElementNS(svg.namespaceURI, "linearGradient");
+    grad.setAttribute("id", "lossFill");
+    grad.setAttribute("x1", "0");
+    grad.setAttribute("y1", "0");
+    grad.setAttribute("x2", "0");
+    grad.setAttribute("y2", "1");
+
+    const stop1 = document.createElementNS(svg.namespaceURI, "stop");
+    stop1.setAttribute("offset", "0%");
+    stop1.setAttribute("stop-color", "#38bdf8");
+    stop1.setAttribute("stop-opacity", "0.45");
+
+    const stop2 = document.createElementNS(svg.namespaceURI, "stop");
+    stop2.setAttribute("offset", "100%");
+    stop2.setAttribute("stop-color", "#38bdf8");
+    stop2.setAttribute("stop-opacity", "0");
+
+    grad.appendChild(stop1);
+    grad.appendChild(stop2);
+    defs.appendChild(grad);
+
+    svg.prepend(defs);
+
+    // Fill area under curve
+    const fillPath = document.createElementNS(svg.namespaceURI, "path");
+    fillPath.setAttribute(
+      "d",
+      `${pathD} L${pts[n - 1][0]},${h - padding.bottom} 
+         L${pts[0][0]},${h - padding.bottom} Z`
+    );
+    fillPath.setAttribute("fill", "url(#lossFill)");
+    fillLayer.appendChild(fillPath);
+
+    // -------------------------------
+    // LOSS LINE
+    // -------------------------------
+    const line = document.createElementNS(svg.namespaceURI, "path");
+    line.setAttribute("d", pathD);
+    line.setAttribute("stroke", "#38bdf8");
+    line.setAttribute("stroke-width", "2.2");
+    line.setAttribute("fill", "none");
+    line.setAttribute("stroke-linecap", "round");
+    line.setAttribute("stroke-linejoin", "round");
+    lineLayer.appendChild(line);
   }
 
   downloadModel() {
@@ -431,7 +557,6 @@ export class TrainingResults {
     this.carouselItems = [];
     this.carouselIndex = 0;
     this.updateSystemStats([]);
-    this.updateInfo();
   }
 
   formatModelName(name) {
