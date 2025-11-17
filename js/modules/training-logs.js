@@ -113,6 +113,6 @@ export class TrainingLogs {
 
   clearLogs() {
     this.logList.innerHTML = "";
-    this.log("Logs cleared");
+    this.log("Welcome AIOZ AI Training");
   }
 }

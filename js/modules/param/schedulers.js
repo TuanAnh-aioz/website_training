@@ -13,7 +13,7 @@ export const AVAILABLE_SCHEDULERS = {
         name: "milestones",
         label: "Milestones",
         type: "text",
-        default: "[30, 60, 90]",
+        default: "[16, 22]",
       },
       { name: "gamma", label: "Gamma", type: "number", default: 0.1 },
     ],

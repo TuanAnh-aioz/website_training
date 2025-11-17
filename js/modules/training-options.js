@@ -614,30 +614,33 @@ export class TrainingOptions {
   }
 
   buildTrainingConfig(options) {
-    const pretrained_item = "";
+    let pretrained_item = "";
     if (!!options.pretrained) {
       pretrained_item = options.pretrained
         ? AVAILABLE_MODELS?.[options.task]?.[options.model]?.weight ?? ""
         : "";
     }
 
-    const num_item = 0;
-    if (options.task == "classification") {
-      num_item = 2;
-    } else {
-      num_item = 3;
-    }
+    const num_item =
+      {
+        classification: 2,
+        detection: 3,
+        segmentation: 4,
+      }[options.task] ?? 0;
 
-    const model = {
+    let model = {
       name: options.model,
       pretrained: pretrained_item,
       resume: "",
       num_classes: num_item,
     };
 
+    const data_csv =  {
+      classification: "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/classification/metadata.csv",
+      detection: "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/detection/metadata.csv",
+    }[options.task] ?? "";
     const dataset = {
-      csv_file:
-        "/home/aioz-ta/Documents/Project/w3ai-infra-node-base/Training/dist/classification/metadata.csv",
+      csv_file: data_csv,
       name: options.dataset,
       batch_size: Number(options.batchSize) || 4,
       num_workers: options.numberWroker,
